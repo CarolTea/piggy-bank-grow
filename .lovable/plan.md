@@ -1,69 +1,57 @@
 
 
-# Smart Pig 🐷 — Protótipo Funcional
+# Upgrade Gamificado do Smart Pig
 
-## Visão Geral
-Aplicativo mobile-first de poupança gamificada com experiência "Web3 Invisível". Interface lúdica inspirada no Duolingo, com um porquinho evolutivo como elemento central.
+## Problema
+O visual atual usa emojis genéricos para o porquinho (com acessórios flutuando na cabeça), cores frias/corporativas e pouca energia visual. Falta a sensação de "jogo mobile" que causa dopamina e retenção.
 
-## Estrutura de Páginas e Componentes
+## Mudanças Propostas
 
-### 1. Tela de Autenticação
-- Login whitelabel simulando Privy SDK
-- Botões: "Entrar com Google", "Entrar com Apple", "Continuar com E-mail"
-- Rodapé: "Sua carteira segura é criada automaticamente"
-- Animação de entrada com Framer Motion
-- Fundo gradiente roxo/rosa com o porquinho animado
+### 1. Porquinho Desenhado em SVG (substituir emojis)
+Criar um componente SVG inline do porquinho com 5 visuais distintos por nível, cada um com personalidade própria -- não emojis com coisas na cabeça. Cada nível terá cores, detalhes e tamanhos diferentes:
+- **Bebê** (0-100): Porquinho rosa pequeno e simples, olhos grandes
+- **Esperto** (100-500): Porquinho com óculos integrados no SVG, expressão confiante
+- **Forte** (500-1k): Porquinho maior, com faixa/bandana, cor mais intensa
+- **Dourado** (1k-5k): Porquinho dourado brilhante com glow animado
+- **Rei** (5k+): Porquinho dourado com coroa integrada, partículas ao redor
 
-### 2. Dashboard Principal — "Porquinho Evolutivo"
-- **Porquinho central animado** que evolui conforme o saldo:
-  - R$0-100: Porquinho bebê 🐷
-  - R$100-500: Porquinho com óculos 🤓🐷
-  - R$500-1000: Porquinho musculoso 💪🐷
-  - R$1000-5000: Porquinho dourado ✨🐷
-  - R$5000+: Porquinho rei 👑🐷
-- Animações de bounce, scale e partículas (confetti) ao depositar
-- **Saldo em R$** com destaque, subtítulo verde: "+5.87% ao ano • Rendendo automaticamente todos os dias"
-- **Barra de progresso** para próxima evolução do porquinho
-- 3 botões de ação: Depositar (PIX), Sacar, Educação
-- Sons de moeda/level-up via Web Audio API
-- Bottom navigation: Home, Histórico, Educação, Perfil
+Cada nível terá animações únicas: o bebê treme suavemente, o rei tem um halo pulsante de luz.
 
-### 3. Modal de Depósito
-- Input de valor em R$ com sugestões rápidas (R$10, R$50, R$100, R$500)
-- Toggle "Pix Automático" com seleção de frequência (semanal/mensal)
-- Fluxo: Confirmar → "Processando..." → Animação de moedas caindo no porquinho → "Depósito confirmado em <1s!"
-- Confetti e som de sucesso
+### 2. Paleta de Cores com Mais Energia
+Atualizar `index.css` com cores mais vibrantes e quentes:
+- **Primary**: de roxo frio para um gradiente vibrante neon rosa/roxo (mais saturado)
+- **Accent**: laranja/amarelo quente para CTAs
+- **Success/Yield**: verde-limão neon (mais chamativo)
+- **Background**: fundo escuro sutil com gradientes (estilo app de jogo)
+- Adicionar um **glow effect** nas classes utilitárias (box-shadow neon)
+- Gradientes mais chamativos e saturados
 
-### 4. Módulo de Educação — Flashcards
-- Cards swipeable (arrastar para esquerda/direita) com Framer Motion
-- Conteúdo simplificado: como o dinheiro rende, o que são vaults, por que é seguro
-- Sem jargões crypto — linguagem acessível
-- Sistema de progresso (cards vistos / total)
+### 3. Dashboard com Mais Vida
+- Fundo do header com gradiente animado (cores que transitam suavemente)
+- Partículas flutuantes (moedas, estrelas) no background do header usando Framer Motion
+- Botões de ação com efeito "glow" e gradientes mais vivos
+- Barra de progresso do porquinho com glow e animação de pulso
+- Saldo com animação de contagem (counting up) ao mudar
+- Badge de "streak" mostrando dias consecutivos poupando
 
-### 5. Tela de Saque
-- Input de valor, saldo disponível
-- Simulação de processamento e confirmação
+### 4. Animações Dopaminérgicas Extras
+- Pulse/glow no saldo quando rende
+- Shake celebratório no porquinho ao depositar
+- Moedas animadas caindo com physics mais realistas no Confetti
+- Efeito de "level up" com flash de tela quando o porquinho evolui
+- Botões com micro-animações de hover (scale + glow)
 
-### 6. Serviços Mock (`services/mockWeb3Services.ts`)
-- `mockPrivyAuth()` — simula login
-- `mockJupiterQuote()` — simula cotação BRL→SOL
-- `mockKaminoYield()` — retorna APY simulado (5.87%)
-- `mockDeposit()` / `mockWithdraw()` — simula transações com delay
+### 5. Login com Mais Impacto
+- Background animado com partículas/bokeh em vez de gradiente estático
+- Porquinho SVG na tela de login também
+- Animação de entrada mais dramática
 
-## Navegação
-- React Router: `/login`, `/dashboard`, `/education`
-- Bottom tab bar no dashboard
-- Modais para depósito e saque
-
-## Stack
-- React + TypeScript + Tailwind CSS
-- Framer Motion para todas as animações
-- Lucide React para ícones
-- Estado local com React Context (AuthContext + BalanceContext)
-- Sons via useSound hook customizado
-
-## Design
-- Paleta: roxo/rosa gradient como primária, verde para rendimentos, dourado para conquistas
-- Mobile-first (max-width container)
-- Cantos arredondados, sombras suaves, tipografia bold e divertida
+## Arquivos a Modificar
+1. **`src/components/EvolutionaryPig.tsx`** -- Reescrever com SVGs desenhados por nível, animações únicas, efeito glow e partículas
+2. **`src/index.css`** -- Nova paleta vibrante, classes utilitárias glow/neon, gradientes animados
+3. **`src/pages/Dashboard.tsx`** -- Header com gradiente animado, partículas flutuantes, streak badge, botões com glow
+4. **`src/pages/Login.tsx`** -- Background com partículas animadas, SVG do porquinho
+5. **`src/components/Confetti.tsx`** -- Moedas 3D com physics melhores
+6. **`src/components/DepositModal.tsx`** -- Animação de level-up quando evolui
+7. **`tailwind.config.ts`** -- Adicionar keyframes de glow e pulse customizados
 
