@@ -13,6 +13,7 @@ interface AuthContextType {
   setPixKey: (key: string) => void;
 }
 
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
