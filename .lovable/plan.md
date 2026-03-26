@@ -1,57 +1,61 @@
 
 
-# Upgrade Gamificado do Smart Pig
+# Fix: Contraste, Proporção do Porquinho, Sons e Menções à Solana
 
-## Problema
-O visual atual usa emojis genéricos para o porquinho (com acessórios flutuando na cabeça), cores frias/corporativas e pouca energia visual. Falta a sensação de "jogo mobile" que causa dopamina e retenção.
+## Problemas Identificados
+1. **Porquinho pequeno demais** — SVG tem apenas 100-140px, quase invisível no header gradiente
+2. **Contraste ruim** — porquinho rosa sobre fundo rosa/roxo se perde; textos com opacidade baixa
+3. **Sons escassos** — só tem `playClick`, `playCoin`, `playSuccess`; faltam sons ao navegar, ao swipe de cards, ao abrir modais
+4. **Zero menções à Solana** — o card de info diz "Cofre Seguro v2", flashcards não explicam Solana, tela de login não menciona
 
-## Mudanças Propostas
+## Correções
 
-### 1. Porquinho Desenhado em SVG (substituir emojis)
-Criar um componente SVG inline do porquinho com 5 visuais distintos por nível, cada um com personalidade própria -- não emojis com coisas na cabeça. Cada nível terá cores, detalhes e tamanhos diferentes:
-- **Bebê** (0-100): Porquinho rosa pequeno e simples, olhos grandes
-- **Esperto** (100-500): Porquinho com óculos integrados no SVG, expressão confiante
-- **Forte** (500-1k): Porquinho maior, com faixa/bandana, cor mais intensa
-- **Dourado** (1k-5k): Porquinho dourado brilhante com glow animado
-- **Rei** (5k+): Porquinho dourado com coroa integrada, partículas ao redor
+### 1. Porquinho Maior e Visível (`EvolutionaryPig.tsx`)
+- Aumentar tamanhos de 100-140px para **160-220px**
+- Adicionar um **fundo circular branco/claro semitransparente** atrás do porquinho para separar do gradiente do header
+- Melhorar contraste dos olhos e detalhes com strokes mais definidos
 
-Cada nível terá animações únicas: o bebê treme suavemente, o rei tem um halo pulsante de luz.
+### 2. Contraste e Cores (`index.css`, `Dashboard.tsx`, `Login.tsx`)
+- Textos informativos: subir opacidade de `text-white/40` e `text-white/50` para `text-white/70` e `text-white/80`
+- Porquinho: círculo de fundo `bg-white/15` com backdrop-blur para destacar do gradiente
+- Labels de saldo e rendimento com maior contraste
+- Info card: bordas mais visíveis, texto com maior peso
 
-### 2. Paleta de Cores com Mais Energia
-Atualizar `index.css` com cores mais vibrantes e quentes:
-- **Primary**: de roxo frio para um gradiente vibrante neon rosa/roxo (mais saturado)
-- **Accent**: laranja/amarelo quente para CTAs
-- **Success/Yield**: verde-limão neon (mais chamativo)
-- **Background**: fundo escuro sutil com gradientes (estilo app de jogo)
-- Adicionar um **glow effect** nas classes utilitárias (box-shadow neon)
-- Gradientes mais chamativos e saturados
+### 3. Mais Sons (`useSound.ts`, vários componentes)
+- Adicionar novos sons ao hook:
+  - `playSwipe` — ao arrastar flashcard
+  - `playDeposit` — som de "cha-ching" ao confirmar depósito (mais elaborado que playCoin)
+  - `playNav` — click suave ao trocar de tab
+  - `playLevelUp` já existe mas **usar efetivamente** ao mudar de nível do porquinho
+  - `playError` — tom grave para erro/valor inválido
+- Integrar sons em:
+  - `FlashcardSwiper` — playSwipe ao arrastar
+  - `BottomNav` — playNav ao trocar tab
+  - `DepositModal` — playDeposit no sucesso (substituir playSuccess+playCoin)
+  - `EvolutionaryPig` — playLevelUp quando nível muda
+  - `Login` — playSuccess ao logar com sucesso
 
-### 3. Dashboard com Mais Vida
-- Fundo do header com gradiente animado (cores que transitam suavemente)
-- Partículas flutuantes (moedas, estrelas) no background do header usando Framer Motion
-- Botões de ação com efeito "glow" e gradientes mais vivos
-- Barra de progresso do porquinho com glow e animação de pulso
-- Saldo com animação de contagem (counting up) ao mudar
-- Badge de "streak" mostrando dias consecutivos poupando
+### 4. Menções à Solana (`Dashboard.tsx`, `mockWeb3Services.ts`, flashcards)
+- Dashboard info card: trocar "Cofre Seguro v2" por "Solana • Kamino Vaults"
+- Adicionar linha "Rede: Solana" com ícone de velocidade
+- Adicionar texto sutil no depósito: "Confirmado via Solana em <1s"
+- Flashcards: adicionar 2 novos cards:
+  - "O que é a Solana?" — rede ultra-rápida, transações em menos de 1 segundo, sem taxas para você
+  - "Kamino Vaults" — seus reais são convertidos e depositados em cofres na Solana que rendem automaticamente
+- Login footer: mudar de "carteira segura" para "Protegido pela rede Solana — rápida, segura e sem taxas"
+- Deposit success: mostrar "Confirmado na Solana ⚡" em vez de só "Depósito confirmado"
 
-### 4. Animações Dopaminérgicas Extras
-- Pulse/glow no saldo quando rende
-- Shake celebratório no porquinho ao depositar
-- Moedas animadas caindo com physics mais realistas no Confetti
-- Efeito de "level up" com flash de tela quando o porquinho evolui
-- Botões com micro-animações de hover (scale + glow)
-
-### 5. Login com Mais Impacto
-- Background animado com partículas/bokeh em vez de gradiente estático
-- Porquinho SVG na tela de login também
-- Animação de entrada mais dramática
+### 5. Deposit Modal: porquinho SVG no sucesso (`DepositModal.tsx`)
+- Substituir o emoji 🐷 no passo de sucesso pelo componente `PigSVG` inline (porquinho real do app)
 
 ## Arquivos a Modificar
-1. **`src/components/EvolutionaryPig.tsx`** -- Reescrever com SVGs desenhados por nível, animações únicas, efeito glow e partículas
-2. **`src/index.css`** -- Nova paleta vibrante, classes utilitárias glow/neon, gradientes animados
-3. **`src/pages/Dashboard.tsx`** -- Header com gradiente animado, partículas flutuantes, streak badge, botões com glow
-4. **`src/pages/Login.tsx`** -- Background com partículas animadas, SVG do porquinho
-5. **`src/components/Confetti.tsx`** -- Moedas 3D com physics melhores
-6. **`src/components/DepositModal.tsx`** -- Animação de level-up quando evolui
-7. **`tailwind.config.ts`** -- Adicionar keyframes de glow e pulse customizados
+1. `src/components/EvolutionaryPig.tsx` — tamanhos maiores, fundo de destaque
+2. `src/hooks/useSound.ts` — novos sons (swipe, nav, deposit, error)
+3. `src/pages/Dashboard.tsx` — contraste de textos, info card com Solana
+4. `src/pages/Login.tsx` — footer com menção Solana, som ao logar
+5. `src/components/DepositModal.tsx` — texto Solana no sucesso, som deposit
+6. `src/components/FlashcardSwiper.tsx` — som ao swipe
+7. `src/components/BottomNav.tsx` — som ao navegar
+8. `src/services/mockWeb3Services.ts` — 2 novos flashcards sobre Solana
+9. `src/index.css` — ajustes de contraste mínimos
 
