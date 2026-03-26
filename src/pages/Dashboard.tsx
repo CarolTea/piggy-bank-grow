@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useBalance } from '@/contexts/BalanceContext';
@@ -8,26 +8,25 @@ import EvolutionaryPig from '@/components/EvolutionaryPig';
 import BottomNav from '@/components/BottomNav';
 import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
-import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap } from 'lucide-react';
+import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const HeaderParticles = () => (
   <>
-    {Array.from({ length: 12 }).map((_, i) => (
+    {Array.from({ length: 10 }).map((_, i) => (
       <motion.div
         key={i}
         className="absolute rounded-full pointer-events-none"
         style={{
-          width: 3 + Math.random() * 6,
-          height: 3 + Math.random() * 6,
-          background: `hsla(${320 + Math.random() * 60}, 90%, 70%, ${0.15 + Math.random() * 0.2})`,
+          width: 3 + Math.random() * 5,
+          height: 3 + Math.random() * 5,
+          background: `hsla(${320 + Math.random() * 60}, 90%, 70%, ${0.1 + Math.random() * 0.15})`,
           left: `${Math.random() * 100}%`,
           top: `${Math.random() * 100}%`,
         }}
         animate={{
-          y: [0, -30 - Math.random() * 20, 0],
-          x: [0, Math.random() * 20 - 10, 0],
-          opacity: [0.1, 0.4, 0.1],
+          y: [0, -25 - Math.random() * 15, 0],
+          opacity: [0.1, 0.35, 0.1],
         }}
         transition={{
           duration: 3 + Math.random() * 3,
@@ -43,12 +42,30 @@ const HeaderParticles = () => (
 const Dashboard = () => {
   const { balance, dailyYield } = useBalance();
   const { user, logout } = useAuth();
-  const { playClick } = useSound();
+  const { playClick, playAmbient, stopAmbient } = useSound();
   const navigate = useNavigate();
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [displayBalance, setDisplayBalance] = useState(balance);
   const [streak] = useState(7);
+  const [muted, setMuted] = useState(false);
+  const ambientStarted = useRef(false);
+
+  // Start ambient on first user interaction
+  useEffect(() => {
+    if (muted) {
+      stopAmbient();
+      return;
+    }
+    const startAmbient = () => {
+      if (!ambientStarted.current) {
+        playAmbient();
+        ambientStarted.current = true;
+      }
+    };
+    window.addEventListener('click', startAmbient, { once: true });
+    return () => window.removeEventListener('click', startAmbient);
+  }, [muted, playAmbient, stopAmbient]);
 
   useEffect(() => {
     const diff = balance - displayBalance;
@@ -69,22 +86,27 @@ const Dashboard = () => {
   }, [balance]);
 
   const handleLogout = () => {
+    stopAmbient();
     logout();
     navigate('/');
   };
 
+  const toggleMute = () => {
+    setMuted(m => !m);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      <div className="relative overflow-hidden gradient-primary animate-gradient px-5 pt-6 pb-10 rounded-b-[2rem]">
+      <div className="relative overflow-hidden gradient-primary animate-gradient px-5 pt-5 pb-5 rounded-b-[2rem]">
         <HeaderParticles />
         
         <div className="max-w-md mx-auto relative z-10">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-3">
             <div>
-              <p className="text-white/70 text-sm">Olá,</p>
+              <p className="text-white/80 text-sm">Olá,</p>
               <p className="text-white font-black text-lg">{user?.name || 'Usuário'} 👋</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <motion.div
                 className="flex items-center gap-1 bg-white/15 backdrop-blur-sm px-3 py-1.5 rounded-full"
                 animate={{ scale: [1, 1.05, 1] }}
@@ -93,8 +115,11 @@ const Dashboard = () => {
                 <Flame size={14} className="text-accent" />
                 <span className="text-white font-black text-xs">{streak}</span>
               </motion.div>
-              <button onClick={handleLogout} className="text-white/50 hover:text-white transition-colors">
-                <LogOut size={18} />
+              <button onClick={toggleMute} className="text-white/60 hover:text-white transition-colors p-1">
+                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
+              <button onClick={handleLogout} className="text-white/60 hover:text-white transition-colors p-1">
+                <LogOut size={16} />
               </button>
             </div>
           </div>
@@ -102,15 +127,15 @@ const Dashboard = () => {
           <EvolutionaryPig />
 
           <motion.div
-            className="text-center mt-4"
+            className="text-center mt-3"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <p className="text-white/70 text-xs font-bold uppercase tracking-wider">Saldo Total</p>
+            <p className="text-white/80 text-xs font-bold uppercase tracking-wider">Saldo Total</p>
             <AnimatePresence mode="wait">
               <motion.p
-                className="text-4xl font-black text-white mt-1"
+                className="text-3xl font-black text-white mt-0.5"
                 key={Math.floor(displayBalance)}
                 initial={{ scale: 1.08, opacity: 0.7 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -120,21 +145,21 @@ const Dashboard = () => {
               </motion.p>
             </AnimatePresence>
             <motion.div
-              className="flex items-center justify-center gap-1.5 mt-1.5"
+              className="flex items-center justify-center gap-1.5 mt-1"
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <TrendingUp size={14} className="text-success" />
-              <p className="text-success text-sm font-black">
+              <TrendingUp size={13} className="text-success" />
+              <p className="text-success text-xs font-black">
                 +5.87% ao ano • +R${dailyYield.toFixed(4)}/dia
               </p>
             </motion.div>
-            <p className="text-white/60 text-xs mt-0.5 font-semibold">Rendendo automaticamente via Solana ⚡</p>
+            <p className="text-white/70 text-[10px] mt-0.5 font-semibold">Rendendo via Solana ⚡</p>
           </motion.div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-5 -mt-5">
+      <div className="max-w-md mx-auto px-5 mt-4 relative z-10">
         <motion.div
           className="flex gap-3"
           initial={{ opacity: 0, y: 20 }}
@@ -163,18 +188,18 @@ const Dashboard = () => {
 
         {/* Info Card */}
         <motion.div
-          className="mt-6 p-5 rounded-2xl bg-card border border-border"
+          className="mt-5 p-4 rounded-2xl bg-card border border-border"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
         >
           <h3 className="font-black text-sm mb-3 flex items-center gap-2">
-            <span className="text-lg">📊</span> Como seu dinheiro está rendendo
+            <span className="text-lg">📊</span> Como seu dinheiro rende
           </h3>
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {[
               { label: 'Rendimento hoje', value: `+R$ ${dailyYield.toFixed(4)}`, color: 'text-success' },
-              { label: 'Rendimento este mês', value: `+R$ ${(dailyYield * 30).toFixed(2)}`, color: 'text-success' },
+              { label: 'Rendimento/mês', value: `+R$ ${(dailyYield * 30).toFixed(2)}`, color: 'text-success' },
               { label: 'APY atual', value: '5.87%', color: 'text-primary' },
               { label: 'Protocolo', value: 'Solana • Kamino Vaults', color: 'text-primary' },
             ].map(item => (
@@ -186,21 +211,20 @@ const Dashboard = () => {
           </div>
           <div className="mt-3 pt-3 border-t border-border flex items-center gap-2">
             <Zap size={14} className="text-accent" />
-            <p className="text-xs text-white/70 font-semibold">
-              Rede Solana — transações em &lt;1s, sem taxas para você
+            <p className="text-xs text-muted-foreground font-semibold">
+              Rede Solana — transações em &lt;1s, sem taxas
             </p>
           </div>
         </motion.div>
 
-        {/* Quick Tips */}
         <motion.div
-          className="mt-4 p-4 rounded-2xl bg-primary/10 border border-primary/20"
+          className="mt-3 p-3 rounded-2xl bg-primary/10 border border-primary/20"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9 }}
         >
           <p className="text-sm font-bold">
-            🔥 <span className="text-gradient font-black">Dica:</span> Ative o Pix Automático e poupe sem esforço todo mês!
+            🔥 <span className="text-gradient font-black">Dica:</span> Ative o Pix Automático e poupe sem esforço!
           </p>
         </motion.div>
       </div>

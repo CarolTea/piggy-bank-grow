@@ -15,10 +15,10 @@ const Education = () => {
             <button onClick={() => navigate('/dashboard')} className="text-white/80 hover:text-white">
               <ArrowLeft size={24} />
             </button>
-            <h1 className="text-xl font-extrabold text-white">Educação Financeira</h1>
+            <h1 className="text-xl font-extrabold text-white">Educação DeFi</h1>
           </div>
-          <p className="text-white/70 text-sm">
-            Aprenda como seu dinheiro rende de forma simples e divertida 🎓
+          <p className="text-white/80 text-sm">
+            Aprenda sobre DeFi, Solana e como seu dinheiro rende 🎓
           </p>
         </div>
       </div>
@@ -43,11 +43,11 @@ const Education = () => {
             <motion.div
               className="h-full rounded-full gradient-primary"
               initial={{ width: 0 }}
-              animate={{ width: '33%' }}
+              animate={{ width: '25%' }}
               transition={{ duration: 1, delay: 0.8 }}
             />
           </div>
-          <p className="text-xs text-muted-foreground mt-1">2 de 6 lições concluídas</p>
+          <p className="text-xs text-muted-foreground mt-1">3 de 12 lições concluídas</p>
         </motion.div>
       </div>
 

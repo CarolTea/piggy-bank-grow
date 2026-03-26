@@ -9,7 +9,6 @@ export interface User {
   walletAddress: string;
 }
 
-// Privy Auth Mock
 export const mockPrivyAuth = async (method: 'google' | 'apple' | 'email', email?: string): Promise<User> => {
   await delay(1200);
   return {
@@ -20,10 +19,9 @@ export const mockPrivyAuth = async (method: 'google' | 'apple' | 'email', email?
   };
 };
 
-// Jupiter API Quote Mock
 export const mockJupiterQuote = async (amountBRL: number) => {
   await delay(600);
-  const solPrice = 680.50; // BRL per SOL
+  const solPrice = 680.50;
   const solAmount = amountBRL / solPrice;
   return {
     inputMint: 'BRL',
@@ -36,7 +34,6 @@ export const mockJupiterQuote = async (amountBRL: number) => {
   };
 };
 
-// Kamino/Jito Yield Mock
 export const mockKaminoYield = async () => {
   await delay(400);
   return {
@@ -47,7 +44,6 @@ export const mockKaminoYield = async () => {
   };
 };
 
-// Deposit Mock
 export const mockDeposit = async (amountBRL: number) => {
   await delay(1800);
   const quote = await mockJupiterQuote(amountBRL);
@@ -61,7 +57,6 @@ export const mockDeposit = async (amountBRL: number) => {
   };
 };
 
-// Withdraw Mock
 export const mockWithdraw = async (amountBRL: number) => {
   await delay(2000);
   return {
@@ -69,11 +64,10 @@ export const mockWithdraw = async (amountBRL: number) => {
     txHash: 'tx_' + Math.random().toString(36).slice(2, 14),
     amountBRL,
     estimatedArrival: '1-2 dias úteis',
-    message: 'Saque processado com sucesso!',
+    message: 'Saque processado com sucesso via Solana!',
   };
 };
 
-// Transaction History Mock
 export interface Transaction {
   id: string;
   type: 'deposit' | 'withdraw' | 'yield';
@@ -90,7 +84,6 @@ export const mockTransactionHistory = (): Transaction[] => [
   { id: '5', type: 'deposit', amount: 50, date: new Date(Date.now() - 86400000 * 7), status: 'completed' },
 ];
 
-// Flashcard data
 export interface Flashcard {
   id: number;
   title: string;
@@ -102,58 +95,86 @@ export interface Flashcard {
 export const mockFlashcards: Flashcard[] = [
   {
     id: 1,
-    title: 'Como seu dinheiro rende?',
-    content: 'Seu dinheiro é investido automaticamente em cofres digitais seguros. É como uma poupança turbinada que rende 5.87% ao ano — muito mais que a poupança tradicional!',
-    emoji: '💰',
-    color: 'from-primary to-secondary',
+    title: 'O que é DeFi?',
+    content: 'DeFi (Finanças Descentralizadas) são serviços financeiros que funcionam sem bancos. Seu dinheiro é gerenciado por contratos inteligentes — programas automáticos que nunca dormem e não cobram taxas abusivas.',
+    emoji: '🏦',
+    color: 'from-violet-600 to-purple-500',
   },
   {
     id: 2,
-    title: 'O que são Cofres Digitais?',
-    content: 'Imagine um cofre super seguro na internet que guarda e multiplica seu dinheiro automaticamente. Milhares de pessoas usam o mesmo cofre, o que gera mais rendimento para todos!',
-    emoji: '🏦',
-    color: 'from-blue-500 to-cyan-400',
+    title: 'Como funciona o Yield Farming?',
+    content: 'Yield Farming é como "plantar" seu dinheiro em um cofre digital e colher rendimentos todo dia. Você empresta seus recursos para protocolos DeFi, que pagam juros automaticamente. É a poupança do futuro!',
+    emoji: '🌾',
+    color: 'from-emerald-600 to-green-500',
   },
   {
     id: 3,
-    title: 'Por que é tão seguro?',
-    content: 'Seu dinheiro está protegido por tecnologia de ponta — a mesma usada por grandes bancos digitais. Ninguém além de você pode movimentar seus fundos. Simples assim!',
-    emoji: '🔒',
-    color: 'from-emerald-500 to-teal-400',
+    title: 'Staking — Rendimento Passivo',
+    content: 'Staking é como deixar seu dinheiro "trabalhando" para validar transações na blockchain. Em troca, você recebe recompensas diárias. No Smart Pig, seu saldo rende automaticamente via Jito Staking na Solana.',
+    emoji: '⛏️',
+    color: 'from-amber-600 to-orange-500',
   },
   {
     id: 4,
-    title: 'Rendimento Diário',
-    content: 'Diferente da poupança que rende só uma vez por mês, aqui seu dinheiro rende todos os dias! Quanto mais tempo fica, mais cresce — é o poder dos juros compostos.',
-    emoji: '📈',
-    color: 'from-amber-500 to-orange-400',
+    title: 'O que é a Solana?',
+    content: 'Solana é uma rede blockchain ultra-rápida que processa milhares de transações por segundo, com taxas quase zero. É a "rodovia expressa" das criptomoedas — seu dinheiro viaja por ela de forma invisível e instantânea.',
+    emoji: '⚡',
+    color: 'from-purple-600 to-indigo-500',
   },
   {
     id: 5,
-    title: 'Pix Automático',
-    content: 'Configure um valor para ser poupado automaticamente todo mês via Pix. Sem esforço, sem esquecer. É a melhor forma de criar o hábito de poupar!',
-    emoji: '⚡',
-    color: 'from-violet-500 to-purple-400',
+    title: 'Kamino Vaults — Cofres Inteligentes',
+    content: 'Seus reais são convertidos automaticamente e depositados nos Kamino Vaults na Solana. Esses cofres usam estratégias DeFi avançadas para maximizar seu rendimento 24h por dia, sem você precisar fazer nada.',
+    emoji: '🏛️',
+    color: 'from-cyan-600 to-blue-500',
   },
   {
     id: 6,
-    title: 'Taxas Zero',
-    content: 'No Smart Pig, você não paga nenhuma taxa para depositar ou sacar. O rendimento que mostramos já é líquido — o que você vê é o que você ganha!',
-    emoji: '🎉',
-    color: 'from-pink-500 to-rose-400',
+    title: 'Liquidez — Por que Seus Reais Rendem',
+    content: 'Quando você deposita no Smart Pig, seu dinheiro entra em pools de liquidez. Outros usuários usam essa liquidez para trocar tokens, e você recebe uma parte das taxas. Quanto mais gente usa, mais você ganha!',
+    emoji: '💧',
+    color: 'from-blue-600 to-cyan-500',
   },
   {
     id: 7,
-    title: 'O que é a Solana?',
-    content: 'Solana é uma rede digital ultra-rápida que processa transações em menos de 1 segundo. Seu dinheiro viaja por ela de forma invisível — você nem percebe, mas é a tecnologia mais rápida do mercado!',
-    emoji: '⚡',
-    color: 'from-purple-500 to-indigo-400',
+    title: 'Smart Contracts — Contratos Automáticos',
+    content: 'Smart Contracts são programas que executam automaticamente quando certas condições são atendidas. Não precisam de intermediários. É como um contrato que se cumpre sozinho — sem burocracia, sem atrasos.',
+    emoji: '📜',
+    color: 'from-pink-600 to-rose-500',
   },
   {
     id: 8,
-    title: 'Kamino Vaults',
-    content: 'Seus reais são convertidos automaticamente e depositados em cofres inteligentes na rede Solana. Esses cofres rendem 24h por dia, todos os dias — sem você precisar fazer nada!',
-    emoji: '🏛️',
-    color: 'from-cyan-500 to-blue-400',
+    title: 'Solana vs Banco Tradicional',
+    content: 'Bancos demoram 1-3 dias para transferências e cobram taxas. Na Solana, transações acontecem em menos de 1 segundo e custam centavos. Seu dinheiro rende 24/7, não só em dias úteis.',
+    emoji: '🏎️',
+    color: 'from-red-600 to-orange-500',
+  },
+  {
+    id: 9,
+    title: 'Risco vs Poupança Tradicional',
+    content: 'A poupança rende 6.17% ao ano, mas perde para a inflação. DeFi oferece rendimentos similares ou maiores, com a vantagem de transparência total — você vê exatamente onde seu dinheiro está, em tempo real.',
+    emoji: '⚖️',
+    color: 'from-slate-600 to-gray-500',
+  },
+  {
+    id: 10,
+    title: 'Taxas Zero — Como é Possível?',
+    content: 'O Smart Pig não cobra taxas de depósito ou saque. O rendimento que mostramos já é líquido. Ganhamos uma pequena parte do yield gerado, alinhando nosso sucesso com o seu. Quando você ganha, nós ganhamos.',
+    emoji: '🎉',
+    color: 'from-fuchsia-600 to-pink-500',
+  },
+  {
+    id: 11,
+    title: 'Carteira Digital Invisível',
+    content: 'Ao criar sua conta, uma carteira digital é criada automaticamente para você. Você não precisa guardar senhas complicadas nem entender de blockchain. Tudo acontece nos bastidores — simples como um app de banco.',
+    emoji: '👛',
+    color: 'from-teal-600 to-emerald-500',
+  },
+  {
+    id: 12,
+    title: 'O Futuro das Finanças',
+    content: 'DeFi está revolucionando como o dinheiro funciona. Sem intermediários, sem burocracia, sem fronteiras. O Smart Pig é a porta de entrada mais simples para esse mundo — seu porquinho cuida de tudo para você! 🐷',
+    emoji: '🚀',
+    color: 'from-indigo-600 to-violet-500',
   },
 ];
