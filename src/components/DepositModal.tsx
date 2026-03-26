@@ -55,9 +55,9 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
     <>
       <Confetti active={showConfetti} />
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="max-w-sm mx-auto rounded-2xl">
+        <DialogContent className="max-w-sm mx-auto rounded-2xl bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl font-extrabold">
+            <DialogTitle className="flex items-center gap-2 text-xl font-black">
               <ArrowDown className="text-primary" size={22} /> Depositar via PIX
             </DialogTitle>
           </DialogHeader>
@@ -72,13 +72,13 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
                 className="space-y-5"
               >
                 <div>
-                  <label className="text-sm font-semibold text-muted-foreground">Valor em R$</label>
+                  <label className="text-sm font-bold text-muted-foreground">Valor em R$</label>
                   <Input
                     type="number"
                     placeholder="0,00"
                     value={amount}
                     onChange={e => setAmount(e.target.value)}
-                    className="mt-1 text-2xl font-bold h-14 text-center"
+                    className="mt-1 text-2xl font-black h-14 text-center bg-muted border-border"
                   />
                 </div>
 
@@ -88,7 +88,9 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
                       key={v}
                       variant="outline"
                       size="sm"
-                      className="flex-1 font-bold"
+                      className={`flex-1 font-black border-border active:scale-90 transition-transform ${
+                        amount === String(v) ? 'gradient-hot text-white border-0' : ''
+                      }`}
                       onClick={() => setAmount(String(v))}
                     >
                       R${v}
@@ -96,11 +98,11 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-xl bg-muted">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-muted border border-border">
                   <div className="flex items-center gap-2">
-                    <Zap className="text-primary" size={18} />
+                    <Zap className="text-accent" size={18} />
                     <div>
-                      <p className="text-sm font-bold">Pix Automático</p>
+                      <p className="text-sm font-black">Pix Automático</p>
                       <p className="text-xs text-muted-foreground">Poupe todo mês sem esforço</p>
                     </div>
                   </div>
@@ -111,14 +113,14 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
                   <motion.p
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="text-xs text-muted-foreground text-center"
+                    className="text-xs text-accent text-center font-bold"
                   >
-                    💡 R${amount || '0'} será depositado automaticamente todo dia 5
+                    🔥 R${amount || '0'} será depositado automaticamente todo dia 5
                   </motion.p>
                 )}
 
                 <Button
-                  className="w-full h-12 text-lg font-extrabold gradient-primary text-primary-foreground rounded-xl"
+                  className="w-full h-13 text-lg font-black gradient-hot text-white rounded-xl glow-pink border-0 active:scale-95 transition-transform"
                   onClick={handleDeposit}
                   disabled={!amount || parseFloat(amount) <= 0}
                 >
@@ -135,8 +137,13 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
                 exit={{ opacity: 0 }}
                 className="flex flex-col items-center gap-4 py-8"
               >
-                <Loader2 className="animate-spin text-primary" size={48} />
-                <p className="font-bold text-lg">Processando...</p>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                >
+                  <Loader2 className="text-primary" size={48} />
+                </motion.div>
+                <p className="font-black text-lg">Processando...</p>
                 <p className="text-sm text-muted-foreground">Confirmando na rede em menos de 1s</p>
               </motion.div>
             )}
@@ -153,19 +160,19 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 300 }}
-                  className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center"
+                  className="w-16 h-16 rounded-full bg-success flex items-center justify-center glow-green"
                 >
                   <Check className="text-white" size={32} />
                 </motion.div>
-                <p className="font-extrabold text-xl">Depósito Confirmado! 🎉</p>
+                <p className="font-black text-xl">Depósito Confirmado! 🎉</p>
                 <p className="text-sm text-muted-foreground">R${amount} adicionados ao seu porquinho</p>
-                <motion.span
+                <motion.div
                   className="text-5xl"
-                  animate={{ y: [0, -20, 0], scale: [1, 1.2, 1] }}
-                  transition={{ duration: 0.6 }}
+                  animate={{ y: [0, -20, 0], scale: [1, 1.3, 1], rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 0.8, repeat: 2 }}
                 >
                   🐷
-                </motion.span>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
