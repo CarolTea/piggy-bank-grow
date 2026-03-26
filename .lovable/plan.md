@@ -1,70 +1,38 @@
 
 
-# Fix: Layout, Porquinho, PIX Simulado, Flashcards DeFi e Sons
+# Fix: Ambient Sound, Pig Blur, Flashcard Pop-ups
 
-## Problemas Identificados
+## 3 Problems
 
-1. **Hero sobrepondo conteúdo abaixo** — o header gradiente com `rounded-b-[2rem]` e os botões com `-mt-5` causam sobreposição; o porquinho (170-220px) + saldo + yield ocupa muito espaço vertical sem overflow controlado
-2. **Porquinho parece rato** — SVG rosa sobre fundo rosa/roxo sem contraste; orelhas muito pontiagudas e longas (`ry: r*0.38`); corpo pequeno relativo ao viewBox; focinho estreito
-3. **PIX não simulado** — depósito mostra apenas spinner genérico sem simulação de QR code ou chave PIX; saque não simula Pix
-4. **Flashcards fracos em DeFi/Web3** — apenas 2 cards mencionam Solana/Kamino; faltam conceitos como yield farming, staking, DeFi, liquidez, smart contracts
-5. **Sem música de fundo** — nenhum som ambiente ao abrir o app; som de "registradora/cha-ching" existe no hook mas pode não estar tocando corretamente
+1. **Ambient sound is an eternal buzz** — `startAmbientLoop()` creates 3 continuous oscillators playing a C major chord forever. Needs to be removed entirely or replaced with something non-annoying.
+2. **Pig is blurry** — the `backdrop-blur-sm` on the circular backdrop and `blur-2xl` on the glow layer are bleeding into the SVG itself, making the pig look out of focus.
+3. **Flashcards should pop up as modals** — some flashcards should appear as surprise pop-ups with a celebration sound when the user clicks "OK".
 
-## Correções
+## Changes
 
-### 1. Layout do Dashboard — Eliminar sobreposição
-- Remover `-mt-5` dos botões de ação
-- Reduzir padding do header (`pb-10` → `pb-6`)
-- Porquinho com tamanho fixo menor no header (140px max) para caber sem overflow
-- Adicionar `relative z-10` nos botões para garantir que ficam acima
-- Mover o card de info para dentro de um scroll area se necessário
+### 1. Kill the Ambient Buzz (`useSound.ts`, `Dashboard.tsx`)
+- Remove `startAmbientLoop`, `stopAmbientLoop`, `ambientNodes` entirely from `useSound.ts`
+- Remove `playAmbient`, `stopAmbient` from the hook return
+- Add a new `playCelebration` sound: rapid ascending tones + sparkle effect (party horn feel)
+- Remove ambient logic from `Dashboard.tsx` (the `useEffect` with `ambientStarted`, the mute toggle controlling ambient)
 
-### 2. Redesenhar o Porquinho SVG
-- **Orelhas mais redondas e curtas**: reduzir `ry` de `0.38` para `0.25`, aumentar `rx` — forma mais arredondada de porco
-- **Corpo mais gordo**: aumentar o raio do corpo (`r` de `0.32` para `0.38`)
-- **Focinho maior e mais oval**: aumentar proporções do snout
-- **Nariz característico**: nostrils maiores e mais visíveis
-- **Cor mais clara e contrastante**: corpo `#FFB0C8` (rosa mais claro e saturado) com stroke branco mais grosso
-- **Fundo circular** mais opaco (`bg-white/25` em vez de `bg-white/12`) para separar do gradiente
-- **Bochechas mais proeminentes**
+### 2. Fix Pig Blur (`EvolutionaryPig.tsx`)
+- Remove `backdrop-blur-sm` from the circular backdrop div
+- Change the glow div from `blur-2xl` to a simple `opacity` animation without blur, or use a very subtle `blur-md` on a separate layer that doesn't overlap the SVG
+- Ensure the SVG itself has `position: relative; z-index: 10` so it renders crisp above any glow effects
 
-### 3. Simulação de PIX no Depósito
-- Após clicar "Confirmar Depósito", mostrar um passo intermediário **"QR Code PIX"** com:
-  - QR code SVG gerado (padrão visual, não funcional)
-  - Chave PIX fictícia: `smartpig@solana.pay`
-  - Botão "Copiar Chave" com feedback
-  - Timer de 10s simulando "Aguardando pagamento..."
-  - Após 3s, auto-confirmar como "Pagamento detectado!"
-- No saque, adicionar passo de "Chave PIX de destino" com input para a chave
+### 3. Flashcard Pop-up System (`FlashcardSwiper.tsx` or new component)
+- Create a `FlashcardPopup` component: a modal/dialog that shows a random flashcard with the card's emoji, title, and content
+- Shows up as a pop-up overlay with scale-in animation
+- Has a single "Entendi! 🎉" button
+- When user clicks the button: play `playCelebration` sound (party/confetti feel) + trigger mini confetti
+- Integrate into `Dashboard.tsx`: trigger a random flashcard pop-up after a deposit succeeds, or on first visit, or after 30 seconds idle
+- The pop-up should feel like a "reward" moment
 
-### 4. Flashcards com Conteúdo DeFi Real
-Substituir e expandir os flashcards para 12 cards cobrindo:
-- O que é DeFi (finanças sem banco)
-- Yield Farming explicado simplesmente
-- Staking — como funciona o rendimento
-- Liquidez — por que seus reais rendem
-- Smart Contracts — contratos automáticos
-- Solana vs sistema bancário tradicional
-- Kamino Vaults em detalhe
-- Risco vs Poupança tradicional
-- Composabilidade DeFi
-- Taxas zero — como é possível
-- Carteira digital invisível
-- O futuro das finanças
-
-### 5. Sons — Música Ambiente e Registradora
-- Adicionar `playAmbient` ao `useSound.ts`: loop suave de tons harmônicos (acorde em C major) que toca ao entrar no Dashboard
-- Garantir que `playDeposit` (cha-ching) toca corretamente — verificar se AudioContext está resumed (precisa de user interaction first)
-- Adicionar `playChaChing` mais elaborado: sequência rápida de tons metálicos agudos (1200→1600→2000→2400 Hz)
-- Som de "moedas caindo" no confetti
-- Botão mute no canto do Dashboard para controlar sons
-
-## Arquivos a Modificar
-1. `src/components/EvolutionaryPig.tsx` — redesenhar SVG (orelhas, corpo, focinho)
-2. `src/pages/Dashboard.tsx` — fix layout/sobreposição, botão mute
-3. `src/components/DepositModal.tsx` — adicionar passo QR Code PIX
-4. `src/components/WithdrawModal.tsx` — adicionar input chave PIX
-5. `src/services/mockWeb3Services.ts` — 12 flashcards DeFi
-6. `src/hooks/useSound.ts` — ambient loop, cha-ching melhorado
-7. `src/pages/Education.tsx` — atualizar contagem de cards
+### Files to Modify
+1. `src/hooks/useSound.ts` — remove ambient, add `playCelebration`
+2. `src/components/EvolutionaryPig.tsx` — remove blur classes from backdrop/glow
+3. `src/components/FlashcardPopup.tsx` — **new file**, modal flashcard with celebration sound
+4. `src/pages/Dashboard.tsx` — remove ambient logic, add pop-up trigger
+5. `src/components/DepositModal.tsx` — trigger flashcard pop-up after successful deposit
 
