@@ -286,7 +286,7 @@ const EvolutionaryPig = ({ animate = true }: Props) => {
       </motion.div>
 
       <motion.p
-        className="text-sm font-black text-gradient"
+        className="text-sm font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
         key={level.label + '-label'}
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
@@ -304,8 +304,8 @@ const EvolutionaryPig = ({ animate = true }: Props) => {
               transition={{ duration: 0.8, ease: 'easeOut' }}
             />
           </div>
-          <p className="text-xs text-white/70 mt-1 text-center font-bold">
-            Próximo: <span className="text-gradient-hot">{nextLevel.label}</span> (R${nextLevel.minBalance})
+          <p className="text-xs text-white/90 mt-1 text-center font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
+            Próximo: <span className="text-accent font-black">{nextLevel.label}</span> (R${nextLevel.minBalance})
           </p>
         </div>
       )}
