@@ -19,7 +19,7 @@ const PIG_LEVELS: PigLevel[] = [
 ];
 
 const getPigLevel = (balance: number): PigLevel => {
-  return PIG_LEVELS.findLast(l => balance >= l.minBalance) || PIG_LEVELS[0];
+  return [...PIG_LEVELS].reverse().find(l => balance >= l.minBalance) || PIG_LEVELS[0];
 };
 
 const getProgress = (balance: number, level: PigLevel): number => {
