@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSound } from '@/hooks/useSound';
+import { PigSVG } from '@/components/EvolutionaryPig';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Mail, Shield } from 'lucide-react';
+import { Loader2, Mail, Zap } from 'lucide-react';
 
-// Bokeh/particle background
 const LoginParticles = () => (
   <>
     {Array.from({ length: 18 }).map((_, i) => (
@@ -38,58 +39,16 @@ const LoginParticles = () => (
   </>
 );
 
-// Inline SVG pig for login screen
-const LoginPig = () => (
-  <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-    <defs>
-      <radialGradient id="loginPigGrad" cx="40%" cy="35%">
-        <stop offset="0%" stopColor="#FF8FAB" />
-        <stop offset="100%" stopColor="#FF6B8A" />
-      </radialGradient>
-      <filter id="loginGlow">
-        <feGaussianBlur stdDeviation="6" result="blur" />
-        <feMerge>
-          <feMergeNode in="blur" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
-      </filter>
-    </defs>
-    <circle cx="60" cy="60" r="52" fill="hsla(320, 90%, 58%, 0.1)" />
-    {/* Ears */}
-    <ellipse cx="38" cy="30" rx="10" ry="14" fill="#FF8FAB" transform="rotate(-15 38 30)" />
-    <ellipse cx="82" cy="30" rx="10" ry="14" fill="#FF8FAB" transform="rotate(15 82 30)" />
-    <ellipse cx="38" cy="32" rx="6" ry="8" fill="#FF5C8A" transform="rotate(-15 38 32)" />
-    <ellipse cx="82" cy="32" rx="6" ry="8" fill="#FF5C8A" transform="rotate(15 82 32)" />
-    {/* Body */}
-    <circle cx="60" cy="58" r="32" fill="url(#loginPigGrad)" filter="url(#loginGlow)" />
-    {/* Cheeks */}
-    <circle cx="42" cy="62" r="6" fill="#FF5C8A" opacity="0.4" />
-    <circle cx="78" cy="62" r="6" fill="#FF5C8A" opacity="0.4" />
-    {/* Snout */}
-    <ellipse cx="60" cy="63" rx="12" ry="9" fill="#FF6B8A" />
-    <ellipse cx="56" cy="64" rx="3" ry="3.5" fill="#FF5C8A" />
-    <ellipse cx="64" cy="64" rx="3" ry="3.5" fill="#FF5C8A" />
-    {/* Eyes */}
-    <circle cx="50" cy="52" r="5" fill="#2D1B30" />
-    <circle cx="70" cy="52" r="5" fill="#2D1B30" />
-    <circle cx="52" cy="50" r="2" fill="white" />
-    <circle cx="72" cy="50" r="2" fill="white" />
-    {/* Smile */}
-    <path d="M54 72 Q60 78 66 72" fill="none" stroke="#2D1B30" strokeWidth="2" strokeLinecap="round" />
-    {/* Feet */}
-    <ellipse cx="48" cy="88" rx="7" ry="4" fill="#FF6B8A" />
-    <ellipse cx="72" cy="88" rx="7" ry="4" fill="#FF6B8A" />
-  </svg>
-);
-
 const Login = () => {
   const { login, isLoading } = useAuth();
+  const { playSuccess } = useSound();
   const navigate = useNavigate();
   const [showEmail, setShowEmail] = useState(false);
   const [email, setEmail] = useState('');
 
   const handleLogin = async (method: 'google' | 'apple' | 'email') => {
     await login(method, method === 'email' ? email : undefined);
+    playSuccess();
     navigate('/dashboard');
   };
 
@@ -109,7 +68,7 @@ const Login = () => {
           animate={{ y: [0, -14, 0] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <LoginPig />
+          <PigSVG size={140} />
         </motion.div>
       </motion.div>
 
@@ -127,7 +86,7 @@ const Login = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="text-white/50 text-center mb-10 max-w-xs relative z-10 font-semibold"
+        className="text-white/70 text-center mb-10 max-w-xs relative z-10 font-semibold"
       >
         Sua poupança inteligente que rende mais. Simples, segura e divertida.
       </motion.p>
@@ -190,10 +149,10 @@ const Login = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="flex items-center gap-2 mt-8 text-white/30 text-xs relative z-10"
+        className="flex items-center gap-2 mt-8 text-white/50 text-xs relative z-10"
       >
-        <Shield size={14} />
-        <p className="font-semibold">Sua carteira segura é criada automaticamente</p>
+        <Zap size={14} />
+        <p className="font-semibold">Protegido pela rede Solana — rápida, segura e sem taxas</p>
       </motion.div>
     </div>
   );

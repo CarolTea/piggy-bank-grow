@@ -1,5 +1,7 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useBalance } from '@/contexts/BalanceContext';
+import { useSound } from '@/hooks/useSound';
 
 interface PigLevel {
   label: string;
@@ -15,11 +17,11 @@ interface PigLevel {
 }
 
 const PIG_LEVELS: PigLevel[] = [
-  { label: 'Porquinho Bebê', minBalance: 0, maxBalance: 100, size: 100, bodyColor: '#FF8FAB', snoutColor: '#FF6B8A', cheekColor: '#FF5C8A', eyeStyle: 'cute', extras: 'none' },
-  { label: 'Porquinho Esperto', minBalance: 100, maxBalance: 500, size: 115, bodyColor: '#FF7BAA', snoutColor: '#FF5C8A', cheekColor: '#FF4785', eyeStyle: 'smart', extras: 'glasses' },
-  { label: 'Porquinho Forte', minBalance: 500, maxBalance: 1000, size: 125, bodyColor: '#E84393', snoutColor: '#D63384', cheekColor: '#C2185B', eyeStyle: 'fierce', extras: 'bandana' },
-  { label: 'Porquinho Dourado', minBalance: 1000, maxBalance: 5000, size: 130, bodyColor: '#FFD700', snoutColor: '#F0C000', cheekColor: '#FFB300', eyeStyle: 'golden', extras: 'glow', glowColor: '#FFD700' },
-  { label: 'Porquinho Rei', minBalance: 5000, maxBalance: Infinity, size: 140, bodyColor: '#FFD700', snoutColor: '#F0C000', cheekColor: '#FFB300', eyeStyle: 'royal', extras: 'crown', glowColor: '#FF6B35' },
+  { label: 'Porquinho Bebê', minBalance: 0, maxBalance: 100, size: 170, bodyColor: '#FF8FAB', snoutColor: '#FF6B8A', cheekColor: '#FF5C8A', eyeStyle: 'cute', extras: 'none' },
+  { label: 'Porquinho Esperto', minBalance: 100, maxBalance: 500, size: 185, bodyColor: '#FF7BAA', snoutColor: '#FF5C8A', cheekColor: '#FF4785', eyeStyle: 'smart', extras: 'glasses' },
+  { label: 'Porquinho Forte', minBalance: 500, maxBalance: 1000, size: 195, bodyColor: '#E84393', snoutColor: '#D63384', cheekColor: '#C2185B', eyeStyle: 'fierce', extras: 'bandana' },
+  { label: 'Porquinho Dourado', minBalance: 1000, maxBalance: 5000, size: 205, bodyColor: '#FFD700', snoutColor: '#F0C000', cheekColor: '#FFB300', eyeStyle: 'golden', extras: 'glow', glowColor: '#FFD700' },
+  { label: 'Porquinho Rei', minBalance: 5000, maxBalance: Infinity, size: 220, bodyColor: '#FFD700', snoutColor: '#F0C000', cheekColor: '#FFB300', eyeStyle: 'royal', extras: 'crown', glowColor: '#FF6B35' },
 ];
 
 const getPigLevel = (balance: number): PigLevel => {
@@ -31,7 +33,8 @@ const getProgress = (balance: number, level: PigLevel): number => {
   return Math.min(100, ((balance - level.minBalance) / (level.maxBalance - level.minBalance)) * 100);
 };
 
-const PigSVG = ({ level, size }: { level: PigLevel; size: number }) => {
+export const PigSVG = ({ level, size }: { level?: PigLevel; size: number }) => {
+  const lvl = level || PIG_LEVELS[0];
   const s = size;
   const cx = s / 2;
   const cy = s / 2;
@@ -40,12 +43,12 @@ const PigSVG = ({ level, size }: { level: PigLevel; size: number }) => {
   return (
     <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} fill="none">
       <defs>
-        <radialGradient id={`bodyGrad-${level.label}`} cx="40%" cy="35%">
-          <stop offset="0%" stopColor={level.bodyColor} stopOpacity="1" />
-          <stop offset="100%" stopColor={level.snoutColor} stopOpacity="1" />
+        <radialGradient id={`bodyGrad-${lvl.label}`} cx="40%" cy="35%">
+          <stop offset="0%" stopColor={lvl.bodyColor} stopOpacity="1" />
+          <stop offset="100%" stopColor={lvl.snoutColor} stopOpacity="1" />
         </radialGradient>
-        {level.glowColor && (
-          <filter id={`glow-${level.label}`}>
+        {lvl.glowColor && (
+          <filter id={`glow-${lvl.label}`}>
             <feGaussianBlur stdDeviation="4" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
@@ -55,84 +58,78 @@ const PigSVG = ({ level, size }: { level: PigLevel; size: number }) => {
         )}
       </defs>
 
-      {/* Glow circle behind golden/king pigs */}
-      {level.glowColor && (
-        <circle cx={cx} cy={cy} r={r + 12} fill={level.glowColor} opacity="0.15" />
+      {lvl.glowColor && (
+        <circle cx={cx} cy={cy} r={r + 12} fill={lvl.glowColor} opacity="0.15" />
       )}
 
       {/* Ears */}
-      <ellipse cx={cx - r * 0.6} cy={cy - r * 0.75} rx={r * 0.28} ry={r * 0.38} fill={level.bodyColor} transform={`rotate(-20 ${cx - r * 0.6} ${cy - r * 0.75})`} />
-      <ellipse cx={cx + r * 0.6} cy={cy - r * 0.75} rx={r * 0.28} ry={r * 0.38} fill={level.bodyColor} transform={`rotate(20 ${cx + r * 0.6} ${cy - r * 0.75})`} />
-      {/* Inner ears */}
-      <ellipse cx={cx - r * 0.6} cy={cy - r * 0.72} rx={r * 0.15} ry={r * 0.22} fill={level.cheekColor} transform={`rotate(-20 ${cx - r * 0.6} ${cy - r * 0.72})`} />
-      <ellipse cx={cx + r * 0.6} cy={cy - r * 0.72} rx={r * 0.15} ry={r * 0.22} fill={level.cheekColor} transform={`rotate(20 ${cx + r * 0.6} ${cy - r * 0.72})`} />
+      <ellipse cx={cx - r * 0.6} cy={cy - r * 0.75} rx={r * 0.28} ry={r * 0.38} fill={lvl.bodyColor} transform={`rotate(-20 ${cx - r * 0.6} ${cy - r * 0.75})`} />
+      <ellipse cx={cx + r * 0.6} cy={cy - r * 0.75} rx={r * 0.28} ry={r * 0.38} fill={lvl.bodyColor} transform={`rotate(20 ${cx + r * 0.6} ${cy - r * 0.75})`} />
+      <ellipse cx={cx - r * 0.6} cy={cy - r * 0.72} rx={r * 0.15} ry={r * 0.22} fill={lvl.cheekColor} transform={`rotate(-20 ${cx - r * 0.6} ${cy - r * 0.72})`} />
+      <ellipse cx={cx + r * 0.6} cy={cy - r * 0.72} rx={r * 0.15} ry={r * 0.22} fill={lvl.cheekColor} transform={`rotate(20 ${cx + r * 0.6} ${cy - r * 0.72})`} />
 
       {/* Body */}
-      <circle cx={cx} cy={cy} r={r} fill={`url(#bodyGrad-${level.label})`} filter={level.glowColor ? `url(#glow-${level.label})` : undefined} />
+      <circle cx={cx} cy={cy} r={r} fill={`url(#bodyGrad-${lvl.label})`} stroke="white" strokeWidth="2" strokeOpacity="0.2" filter={lvl.glowColor ? `url(#glow-${lvl.label})` : undefined} />
 
       {/* Cheeks */}
-      <circle cx={cx - r * 0.55} cy={cy + r * 0.15} r={r * 0.18} fill={level.cheekColor} opacity="0.5" />
-      <circle cx={cx + r * 0.55} cy={cy + r * 0.15} r={r * 0.18} fill={level.cheekColor} opacity="0.5" />
+      <circle cx={cx - r * 0.55} cy={cy + r * 0.15} r={r * 0.18} fill={lvl.cheekColor} opacity="0.5" />
+      <circle cx={cx + r * 0.55} cy={cy + r * 0.15} r={r * 0.18} fill={lvl.cheekColor} opacity="0.5" />
 
       {/* Snout */}
-      <ellipse cx={cx} cy={cy + r * 0.15} rx={r * 0.35} ry={r * 0.25} fill={level.snoutColor} />
-      {/* Nostrils */}
-      <ellipse cx={cx - r * 0.1} cy={cy + r * 0.18} rx={r * 0.07} ry={r * 0.09} fill={level.cheekColor} />
-      <ellipse cx={cx + r * 0.1} cy={cy + r * 0.18} rx={r * 0.07} ry={r * 0.09} fill={level.cheekColor} />
+      <ellipse cx={cx} cy={cy + r * 0.15} rx={r * 0.35} ry={r * 0.25} fill={lvl.snoutColor} />
+      <ellipse cx={cx - r * 0.1} cy={cy + r * 0.18} rx={r * 0.07} ry={r * 0.09} fill={lvl.cheekColor} />
+      <ellipse cx={cx + r * 0.1} cy={cy + r * 0.18} rx={r * 0.07} ry={r * 0.09} fill={lvl.cheekColor} />
 
       {/* Eyes */}
-      {level.eyeStyle === 'cute' && (
+      {lvl.eyeStyle === 'cute' && (
         <>
-          {/* Big sparkly eyes */}
           <circle cx={cx - r * 0.25} cy={cy - r * 0.2} r={r * 0.14} fill="#2D1B30" />
           <circle cx={cx + r * 0.25} cy={cy - r * 0.2} r={r * 0.14} fill="#2D1B30" />
-          <circle cx={cx - r * 0.22} cy={cy - r * 0.25} r={r * 0.05} fill="white" />
-          <circle cx={cx + r * 0.28} cy={cy - r * 0.25} r={r * 0.05} fill="white" />
+          <circle cx={cx - r * 0.22} cy={cy - r * 0.25} r={r * 0.06} fill="white" />
+          <circle cx={cx + r * 0.28} cy={cy - r * 0.25} r={r * 0.06} fill="white" />
         </>
       )}
-      {level.eyeStyle === 'smart' && (
+      {lvl.eyeStyle === 'smart' && (
         <>
           <circle cx={cx - r * 0.25} cy={cy - r * 0.2} r={r * 0.12} fill="#2D1B30" />
           <circle cx={cx + r * 0.25} cy={cy - r * 0.2} r={r * 0.12} fill="#2D1B30" />
-          <circle cx={cx - r * 0.22} cy={cy - r * 0.24} r={r * 0.04} fill="white" />
-          <circle cx={cx + r * 0.28} cy={cy - r * 0.24} r={r * 0.04} fill="white" />
+          <circle cx={cx - r * 0.22} cy={cy - r * 0.24} r={r * 0.05} fill="white" />
+          <circle cx={cx + r * 0.28} cy={cy - r * 0.24} r={r * 0.05} fill="white" />
         </>
       )}
-      {level.eyeStyle === 'fierce' && (
+      {lvl.eyeStyle === 'fierce' && (
         <>
           <circle cx={cx - r * 0.25} cy={cy - r * 0.18} r={r * 0.11} fill="#2D1B30" />
           <circle cx={cx + r * 0.25} cy={cy - r * 0.18} r={r * 0.11} fill="#2D1B30" />
           <circle cx={cx - r * 0.22} cy={cy - r * 0.22} r={r * 0.04} fill="white" />
           <circle cx={cx + r * 0.28} cy={cy - r * 0.22} r={r * 0.04} fill="white" />
-          {/* Angry eyebrows */}
           <line x1={cx - r * 0.38} y1={cy - r * 0.36} x2={cx - r * 0.12} y2={cy - r * 0.32} stroke="#2D1B30" strokeWidth="2.5" strokeLinecap="round" />
           <line x1={cx + r * 0.38} y1={cy - r * 0.36} x2={cx + r * 0.12} y2={cy - r * 0.32} stroke="#2D1B30" strokeWidth="2.5" strokeLinecap="round" />
         </>
       )}
-      {(level.eyeStyle === 'golden' || level.eyeStyle === 'royal') && (
+      {(lvl.eyeStyle === 'golden' || lvl.eyeStyle === 'royal') && (
         <>
           <circle cx={cx - r * 0.25} cy={cy - r * 0.2} r={r * 0.13} fill="#5D3A00" />
           <circle cx={cx + r * 0.25} cy={cy - r * 0.2} r={r * 0.13} fill="#5D3A00" />
           <circle cx={cx - r * 0.22} cy={cy - r * 0.25} r={r * 0.05} fill="#FFF8DC" />
           <circle cx={cx + r * 0.28} cy={cy - r * 0.25} r={r * 0.05} fill="#FFF8DC" />
-          {/* Star sparkle */}
           <text x={cx + r * 0.42} y={cy - r * 0.35} fontSize={r * 0.18} fill="#FFF8DC">✦</text>
         </>
       )}
 
-      {/* Glasses for smart pig */}
-      {level.extras === 'glasses' && (
+      {/* Glasses */}
+      {lvl.extras === 'glasses' && (
         <>
-          <circle cx={cx - r * 0.25} cy={cy - r * 0.2} r={r * 0.2} fill="none" stroke="#4A2C82" strokeWidth="2" />
-          <circle cx={cx + r * 0.25} cy={cy - r * 0.2} r={r * 0.2} fill="none" stroke="#4A2C82" strokeWidth="2" />
-          <line x1={cx - r * 0.05} y1={cy - r * 0.2} x2={cx + r * 0.05} y2={cy - r * 0.2} stroke="#4A2C82" strokeWidth="2" />
-          <line x1={cx - r * 0.45} y1={cy - r * 0.2} x2={cx - r * 0.6} y2={cy - r * 0.35} stroke="#4A2C82" strokeWidth="2" />
-          <line x1={cx + r * 0.45} y1={cy - r * 0.2} x2={cx + r * 0.6} y2={cy - r * 0.35} stroke="#4A2C82" strokeWidth="2" />
+          <circle cx={cx - r * 0.25} cy={cy - r * 0.2} r={r * 0.2} fill="none" stroke="#4A2C82" strokeWidth="2.5" />
+          <circle cx={cx + r * 0.25} cy={cy - r * 0.2} r={r * 0.2} fill="none" stroke="#4A2C82" strokeWidth="2.5" />
+          <line x1={cx - r * 0.05} y1={cy - r * 0.2} x2={cx + r * 0.05} y2={cy - r * 0.2} stroke="#4A2C82" strokeWidth="2.5" />
+          <line x1={cx - r * 0.45} y1={cy - r * 0.2} x2={cx - r * 0.6} y2={cy - r * 0.35} stroke="#4A2C82" strokeWidth="2.5" />
+          <line x1={cx + r * 0.45} y1={cy - r * 0.2} x2={cx + r * 0.6} y2={cy - r * 0.35} stroke="#4A2C82" strokeWidth="2.5" />
         </>
       )}
 
-      {/* Bandana for fierce pig */}
-      {level.extras === 'bandana' && (
+      {/* Bandana */}
+      {lvl.extras === 'bandana' && (
         <>
           <path d={`M${cx - r * 0.85} ${cy - r * 0.45} Q${cx} ${cy - r * 0.7} ${cx + r * 0.85} ${cy - r * 0.45}`} fill="none" stroke="#E84393" strokeWidth="5" strokeLinecap="round" />
           <circle cx={cx + r * 0.8} cy={cy - r * 0.45} r={r * 0.08} fill="#E84393" />
@@ -141,18 +138,17 @@ const PigSVG = ({ level, size }: { level: PigLevel; size: number }) => {
         </>
       )}
 
-      {/* Crown for king pig */}
-      {level.extras === 'crown' && (
+      {/* Crown */}
+      {lvl.extras === 'crown' && (
         <>
           <path d={`M${cx - r * 0.45} ${cy - r * 0.55} L${cx - r * 0.35} ${cy - r * 0.9} L${cx - r * 0.12} ${cy - r * 0.65} L${cx} ${cy - r * 1.0} L${cx + r * 0.12} ${cy - r * 0.65} L${cx + r * 0.35} ${cy - r * 0.9} L${cx + r * 0.45} ${cy - r * 0.55} Z`}
-            fill="url(#crownGrad)" stroke="#B8860B" strokeWidth="1" />
+            fill="url(#crownGrad)" stroke="#B8860B" strokeWidth="1.5" />
           <defs>
             <linearGradient id="crownGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#FFD700" />
               <stop offset="100%" stopColor="#FF8C00" />
             </linearGradient>
           </defs>
-          {/* Crown gems */}
           <circle cx={cx} cy={cy - r * 0.82} r={r * 0.06} fill="#FF1744" />
           <circle cx={cx - r * 0.25} cy={cy - r * 0.72} r={r * 0.04} fill="#2979FF" />
           <circle cx={cx + r * 0.25} cy={cy - r * 0.72} r={r * 0.04} fill="#00E676" />
@@ -163,13 +159,12 @@ const PigSVG = ({ level, size }: { level: PigLevel; size: number }) => {
       <path d={`M${cx - r * 0.15} ${cy + r * 0.35} Q${cx} ${cy + r * 0.5} ${cx + r * 0.15} ${cy + r * 0.35}`} fill="none" stroke="#2D1B30" strokeWidth="2" strokeLinecap="round" />
 
       {/* Feet */}
-      <ellipse cx={cx - r * 0.35} cy={cy + r * 0.9} rx={r * 0.18} ry={r * 0.1} fill={level.snoutColor} />
-      <ellipse cx={cx + r * 0.35} cy={cy + r * 0.9} rx={r * 0.18} ry={r * 0.1} fill={level.snoutColor} />
+      <ellipse cx={cx - r * 0.35} cy={cy + r * 0.9} rx={r * 0.18} ry={r * 0.1} fill={lvl.snoutColor} />
+      <ellipse cx={cx + r * 0.35} cy={cy + r * 0.9} rx={r * 0.18} ry={r * 0.1} fill={lvl.snoutColor} />
     </svg>
   );
 };
 
-// Floating particles around golden/king pigs
 const FloatingParticles = ({ count, color }: { count: number; color: string }) => (
   <>
     {Array.from({ length: count }).map((_, i) => (
@@ -205,10 +200,20 @@ interface Props {
 
 const EvolutionaryPig = ({ animate = true }: Props) => {
   const { balance } = useBalance();
+  const { playLevelUp } = useSound();
   const level = getPigLevel(balance);
   const progress = getProgress(balance, level);
   const levelIndex = PIG_LEVELS.indexOf(level);
   const nextLevel = PIG_LEVELS[Math.min(levelIndex + 1, PIG_LEVELS.length - 1)];
+  const prevLevelRef = useRef(level.label);
+
+  // Play level up sound when pig evolves
+  useEffect(() => {
+    if (prevLevelRef.current !== level.label) {
+      playLevelUp();
+      prevLevelRef.current = level.label;
+    }
+  }, [level.label, playLevelUp]);
 
   const bounceAnimation = level.eyeStyle === 'cute'
     ? { y: [0, -6, 0], rotate: [0, 2, -2, 0] }
@@ -229,6 +234,18 @@ const EvolutionaryPig = ({ animate = true }: Props) => {
           ease: 'easeInOut',
         }}
       >
+        {/* Circular backdrop for contrast */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            className="rounded-full backdrop-blur-sm"
+            style={{
+              width: level.size * 0.85,
+              height: level.size * 0.85,
+              background: 'rgba(255,255,255,0.12)',
+            }}
+          />
+        </div>
+
         {/* Glow behind pig */}
         {level.glowColor && (
           <motion.div
@@ -239,7 +256,6 @@ const EvolutionaryPig = ({ animate = true }: Props) => {
           />
         )}
 
-        {/* Floating particles for golden/king */}
         {(level.extras === 'glow' || level.extras === 'crown') && (
           <FloatingParticles count={8} color={level.glowColor || '#FFD700'} />
         )}

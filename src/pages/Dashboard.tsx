@@ -8,10 +8,9 @@ import EvolutionaryPig from '@/components/EvolutionaryPig';
 import BottomNav from '@/components/BottomNav';
 import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
-import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame } from 'lucide-react';
+import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// Floating background particles for the header
 const HeaderParticles = () => (
   <>
     {Array.from({ length: 12 }).map((_, i) => (
@@ -49,9 +48,8 @@ const Dashboard = () => {
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [displayBalance, setDisplayBalance] = useState(balance);
-  const [streak] = useState(7); // mock streak
+  const [streak] = useState(7);
 
-  // Animate balance counting up
   useEffect(() => {
     const diff = balance - displayBalance;
     if (Math.abs(diff) < 0.001) return;
@@ -77,18 +75,16 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header with animated gradient */}
       <div className="relative overflow-hidden gradient-primary animate-gradient px-5 pt-6 pb-10 rounded-b-[2rem]">
         <HeaderParticles />
         
         <div className="max-w-md mx-auto relative z-10">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <p className="text-white/60 text-sm">Olá,</p>
+              <p className="text-white/70 text-sm">Olá,</p>
               <p className="text-white font-black text-lg">{user?.name || 'Usuário'} 👋</p>
             </div>
             <div className="flex items-center gap-3">
-              {/* Streak badge */}
               <motion.div
                 className="flex items-center gap-1 bg-white/15 backdrop-blur-sm px-3 py-1.5 rounded-full"
                 animate={{ scale: [1, 1.05, 1] }}
@@ -97,7 +93,7 @@ const Dashboard = () => {
                 <Flame size={14} className="text-accent" />
                 <span className="text-white font-black text-xs">{streak}</span>
               </motion.div>
-              <button onClick={handleLogout} className="text-white/40 hover:text-white transition-colors">
+              <button onClick={handleLogout} className="text-white/50 hover:text-white transition-colors">
                 <LogOut size={18} />
               </button>
             </div>
@@ -111,7 +107,7 @@ const Dashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <p className="text-white/50 text-xs font-bold uppercase tracking-wider">Saldo Total</p>
+            <p className="text-white/70 text-xs font-bold uppercase tracking-wider">Saldo Total</p>
             <AnimatePresence mode="wait">
               <motion.p
                 className="text-4xl font-black text-white mt-1"
@@ -133,12 +129,11 @@ const Dashboard = () => {
                 +5.87% ao ano • +R${dailyYield.toFixed(4)}/dia
               </p>
             </motion.div>
-            <p className="text-white/40 text-xs mt-0.5 font-semibold">Rendendo automaticamente todos os dias</p>
+            <p className="text-white/60 text-xs mt-0.5 font-semibold">Rendendo automaticamente via Solana ⚡</p>
           </motion.div>
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="max-w-md mx-auto px-5 -mt-5">
         <motion.div
           className="flex gap-3"
@@ -181,13 +176,19 @@ const Dashboard = () => {
               { label: 'Rendimento hoje', value: `+R$ ${dailyYield.toFixed(4)}`, color: 'text-success' },
               { label: 'Rendimento este mês', value: `+R$ ${(dailyYield * 30).toFixed(2)}`, color: 'text-success' },
               { label: 'APY atual', value: '5.87%', color: 'text-primary' },
-              { label: 'Protocolo', value: 'Cofre Seguro v2', color: 'text-muted-foreground' },
+              { label: 'Protocolo', value: 'Solana • Kamino Vaults', color: 'text-primary' },
             ].map(item => (
               <div key={item.label} className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">{item.label}</span>
                 <span className={`text-sm font-black ${item.color}`}>{item.value}</span>
               </div>
             ))}
+          </div>
+          <div className="mt-3 pt-3 border-t border-border flex items-center gap-2">
+            <Zap size={14} className="text-accent" />
+            <p className="text-xs text-white/70 font-semibold">
+              Rede Solana — transações em &lt;1s, sem taxas para você
+            </p>
           </div>
         </motion.div>
 

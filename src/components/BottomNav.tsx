@@ -1,6 +1,7 @@
 import { Home, Clock, GraduationCap, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useSound } from '@/hooks/useSound';
 
 const tabs = [
   { icon: Home, label: 'Home', path: '/dashboard' },
@@ -12,6 +13,7 @@ const tabs = [
 const BottomNav = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { playNav } = useSound();
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/80 backdrop-blur-xl border-t border-border">
@@ -22,7 +24,7 @@ const BottomNav = () => {
           return (
             <button
               key={tab.label}
-              onClick={() => navigate(tab.path)}
+              onClick={() => { playNav(); navigate(tab.path); }}
               className="flex flex-col items-center gap-0.5 px-3 py-1 relative active:scale-90 transition-transform"
             >
               {active && (
