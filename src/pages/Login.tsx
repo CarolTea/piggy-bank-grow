@@ -6,6 +6,82 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Mail, Shield } from 'lucide-react';
 
+// Bokeh/particle background
+const LoginParticles = () => (
+  <>
+    {Array.from({ length: 18 }).map((_, i) => (
+      <motion.div
+        key={i}
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          width: 6 + Math.random() * 20,
+          height: 6 + Math.random() * 20,
+          background: `hsla(${300 + Math.random() * 80}, 80%, 60%, ${0.06 + Math.random() * 0.12})`,
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          filter: 'blur(1px)',
+        }}
+        animate={{
+          y: [0, -40 - Math.random() * 30, 0],
+          x: [0, Math.random() * 30 - 15, 0],
+          scale: [1, 1.3, 1],
+          opacity: [0.1, 0.3, 0.1],
+        }}
+        transition={{
+          duration: 4 + Math.random() * 4,
+          repeat: Infinity,
+          delay: Math.random() * 4,
+          ease: 'easeInOut',
+        }}
+      />
+    ))}
+  </>
+);
+
+// Inline SVG pig for login screen
+const LoginPig = () => (
+  <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+    <defs>
+      <radialGradient id="loginPigGrad" cx="40%" cy="35%">
+        <stop offset="0%" stopColor="#FF8FAB" />
+        <stop offset="100%" stopColor="#FF6B8A" />
+      </radialGradient>
+      <filter id="loginGlow">
+        <feGaussianBlur stdDeviation="6" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+    <circle cx="60" cy="60" r="52" fill="hsla(320, 90%, 58%, 0.1)" />
+    {/* Ears */}
+    <ellipse cx="38" cy="30" rx="10" ry="14" fill="#FF8FAB" transform="rotate(-15 38 30)" />
+    <ellipse cx="82" cy="30" rx="10" ry="14" fill="#FF8FAB" transform="rotate(15 82 30)" />
+    <ellipse cx="38" cy="32" rx="6" ry="8" fill="#FF5C8A" transform="rotate(-15 38 32)" />
+    <ellipse cx="82" cy="32" rx="6" ry="8" fill="#FF5C8A" transform="rotate(15 82 32)" />
+    {/* Body */}
+    <circle cx="60" cy="58" r="32" fill="url(#loginPigGrad)" filter="url(#loginGlow)" />
+    {/* Cheeks */}
+    <circle cx="42" cy="62" r="6" fill="#FF5C8A" opacity="0.4" />
+    <circle cx="78" cy="62" r="6" fill="#FF5C8A" opacity="0.4" />
+    {/* Snout */}
+    <ellipse cx="60" cy="63" rx="12" ry="9" fill="#FF6B8A" />
+    <ellipse cx="56" cy="64" rx="3" ry="3.5" fill="#FF5C8A" />
+    <ellipse cx="64" cy="64" rx="3" ry="3.5" fill="#FF5C8A" />
+    {/* Eyes */}
+    <circle cx="50" cy="52" r="5" fill="#2D1B30" />
+    <circle cx="70" cy="52" r="5" fill="#2D1B30" />
+    <circle cx="52" cy="50" r="2" fill="white" />
+    <circle cx="72" cy="50" r="2" fill="white" />
+    {/* Smile */}
+    <path d="M54 72 Q60 78 66 72" fill="none" stroke="#2D1B30" strokeWidth="2" strokeLinecap="round" />
+    {/* Feet */}
+    <ellipse cx="48" cy="88" rx="7" ry="4" fill="#FF6B8A" />
+    <ellipse cx="72" cy="88" rx="7" ry="4" fill="#FF6B8A" />
+  </svg>
+);
+
 const Login = () => {
   const { login, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -18,27 +94,31 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen gradient-primary flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center px-6"
+      style={{ background: 'linear-gradient(145deg, hsl(280 60% 12%), hsl(320 70% 15%), hsl(260 50% 10%))' }}
+    >
+      <LoginParticles />
+
       <motion.div
         initial={{ scale: 0, rotate: -20 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-        className="mb-6"
+        className="mb-4 relative z-10"
       >
-        <motion.span
-          className="text-8xl block"
-          animate={{ y: [0, -12, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        <motion.div
+          animate={{ y: [0, -14, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
         >
-          🐷
-        </motion.span>
+          <LoginPig />
+        </motion.div>
       </motion.div>
 
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="text-4xl font-black text-white mb-2"
+        className="text-5xl font-black text-white mb-1 relative z-10"
+        style={{ textShadow: '0 0 40px hsla(320, 90%, 58%, 0.4)' }}
       >
         Smart Pig
       </motion.h1>
@@ -47,7 +127,7 @@ const Login = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="text-white/80 text-center mb-10 max-w-xs"
+        className="text-white/50 text-center mb-10 max-w-xs relative z-10 font-semibold"
       >
         Sua poupança inteligente que rende mais. Simples, segura e divertida.
       </motion.p>
@@ -56,10 +136,10 @@ const Login = () => {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="w-full max-w-sm space-y-3"
+        className="w-full max-w-sm space-y-3 relative z-10"
       >
         <Button
-          className="w-full h-13 text-base font-bold rounded-xl bg-white text-foreground hover:bg-white/90 gap-3"
+          className="w-full h-14 text-base font-black rounded-2xl bg-white text-background hover:bg-white/90 gap-3 active:scale-95 transition-transform"
           onClick={() => handleLogin('google')}
           disabled={isLoading}
         >
@@ -70,7 +150,7 @@ const Login = () => {
         </Button>
 
         <Button
-          className="w-full h-13 text-base font-bold rounded-xl bg-black text-white hover:bg-black/90 gap-3"
+          className="w-full h-14 text-base font-black rounded-2xl bg-white/10 text-white hover:bg-white/15 gap-3 border border-white/10 active:scale-95 transition-transform backdrop-blur-sm"
           onClick={() => handleLogin('apple')}
           disabled={isLoading}
         >
@@ -80,8 +160,7 @@ const Login = () => {
 
         {!showEmail ? (
           <Button
-            variant="ghost"
-            className="w-full h-13 text-base font-bold rounded-xl text-white/90 hover:bg-white/10 gap-3"
+            className="w-full h-14 text-base font-black rounded-2xl text-white/70 hover:text-white hover:bg-white/5 gap-3 border-0 bg-transparent active:scale-95 transition-transform"
             onClick={() => setShowEmail(true)}
           >
             <Mail size={20} />
@@ -94,10 +173,10 @@ const Login = () => {
               placeholder="seu@email.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="h-13 rounded-xl bg-white/20 border-white/30 text-white placeholder:text-white/50"
+              className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
             />
             <Button
-              className="w-full h-13 rounded-xl bg-white/20 text-white font-bold hover:bg-white/30"
+              className="w-full h-14 rounded-2xl gradient-hot text-white font-black glow-pink border-0 active:scale-95 transition-transform"
               onClick={() => handleLogin('email')}
               disabled={!email || isLoading}
             >
@@ -111,10 +190,10 @@ const Login = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="flex items-center gap-2 mt-8 text-white/60 text-xs"
+        className="flex items-center gap-2 mt-8 text-white/30 text-xs relative z-10"
       >
         <Shield size={14} />
-        <p>Sua carteira segura é criada automaticamente</p>
+        <p className="font-semibold">Sua carteira segura é criada automaticamente</p>
       </motion.div>
     </div>
   );

@@ -6,18 +6,20 @@ interface Props {
   duration?: number;
 }
 
-const EMOJIS = ['🪙', '💰', '✨', '⭐', '🎉'];
+const COINS = ['🪙', '💰', '✨', '⭐', '💎', '🔥'];
 
-const Confetti = ({ active, duration = 2000 }: Props) => {
-  const [particles, setParticles] = useState<{ id: number; emoji: string; x: number; delay: number }[]>([]);
+const Confetti = ({ active, duration = 2500 }: Props) => {
+  const [particles, setParticles] = useState<{ id: number; emoji: string; x: number; delay: number; size: number; spin: number }[]>([]);
 
   useEffect(() => {
     if (active) {
-      const p = Array.from({ length: 20 }, (_, i) => ({
+      const p = Array.from({ length: 30 }, (_, i) => ({
         id: i,
-        emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+        emoji: COINS[Math.floor(Math.random() * COINS.length)],
         x: Math.random() * 100,
-        delay: Math.random() * 0.5,
+        delay: Math.random() * 0.6,
+        size: 16 + Math.random() * 20,
+        spin: Math.random() * 720 - 360,
       }));
       setParticles(p);
       const timer = setTimeout(() => setParticles([]), duration);
@@ -32,12 +34,22 @@ const Confetti = ({ active, duration = 2000 }: Props) => {
       {particles.map(p => (
         <motion.span
           key={p.id}
-          className="fixed z-50 text-2xl pointer-events-none"
-          style={{ left: `${p.x}%` }}
-          initial={{ top: '-10%', opacity: 1, scale: 0.5 }}
-          animate={{ top: '110%', opacity: 0, scale: 1, rotate: Math.random() * 360 }}
+          className="fixed z-50 pointer-events-none"
+          style={{ left: `${p.x}%`, fontSize: p.size }}
+          initial={{ top: '-5%', opacity: 1, scale: 0.3, rotate: 0 }}
+          animate={{
+            top: '105%',
+            opacity: [1, 1, 0],
+            scale: [0.3, 1.2, 0.8],
+            rotate: p.spin,
+            x: [0, Math.random() * 60 - 30, Math.random() * 40 - 20],
+          }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.5 + Math.random(), delay: p.delay, ease: 'easeIn' }}
+          transition={{
+            duration: 1.8 + Math.random() * 0.8,
+            delay: p.delay,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }}
         >
           {p.emoji}
         </motion.span>
