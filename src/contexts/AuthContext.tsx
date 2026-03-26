@@ -1,17 +1,22 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { mockPrivyAuth, User } from '@/services/mockWeb3Services';
 
+interface AuthUser extends User {
+  pixKey?: string;
+}
+
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   isLoading: boolean;
   login: (method: 'google' | 'apple' | 'email', email?: string) => Promise<void>;
   logout: () => void;
+  setPixKey: (key: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const login = useCallback(async (method: 'google' | 'apple' | 'email', email?: string) => {
@@ -26,8 +31,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = useCallback(() => setUser(null), []);
 
+  const setPixKey = useCallback((key: string) => {
+    setUser(prev => prev ? { ...prev, pixKey: key } : prev);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, setPixKey }}>
       {children}
     </AuthContext.Provider>
   );
