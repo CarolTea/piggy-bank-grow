@@ -14,6 +14,7 @@ import { ArrowDown, Zap, Check, Loader2, Copy, QrCode } from 'lucide-react';
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 const QUICK_VALUES = [10, 50, 100, 500];
