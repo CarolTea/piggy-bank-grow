@@ -142,4 +142,18 @@ export const mockFlashcards: Flashcard[] = [
     emoji: '🎉',
     color: 'from-pink-500 to-rose-400',
   },
+  {
+    id: 7,
+    title: 'O que é a Solana?',
+    content: 'Solana é uma rede digital ultra-rápida que processa transações em menos de 1 segundo. Seu dinheiro viaja por ela de forma invisível — você nem percebe, mas é a tecnologia mais rápida do mercado!',
+    emoji: '⚡',
+    color: 'from-purple-500 to-indigo-400',
+  },
+  {
+    id: 8,
+    title: 'Kamino Vaults',
+    content: 'Seus reais são convertidos automaticamente e depositados em cofres inteligentes na rede Solana. Esses cofres rendem 24h por dia, todos os dias — sem você precisar fazer nada!',
+    emoji: '🏛️',
+    color: 'from-cyan-500 to-blue-400',
+  },
 ];

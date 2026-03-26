@@ -37,5 +37,27 @@ export const useSound = () => {
     playTone(600, 0.05, 'sine', 0.08);
   }, []);
 
-  return { playCoin, playLevelUp, playSuccess, playClick };
+  const playSwipe = useCallback(() => {
+    playTone(400, 0.08, 'sine', 0.06);
+    setTimeout(() => playTone(500, 0.06, 'sine', 0.04), 60);
+  }, []);
+
+  const playNav = useCallback(() => {
+    playTone(700, 0.04, 'sine', 0.06);
+  }, []);
+
+  const playDeposit = useCallback(() => {
+    // Cha-ching sound
+    playTone(1200, 0.08, 'square', 0.08);
+    setTimeout(() => playTone(1600, 0.08, 'square', 0.08), 80);
+    setTimeout(() => playTone(2000, 0.12, 'square', 0.1), 160);
+    setTimeout(() => playTone(2400, 0.2, 'sine', 0.12), 260);
+  }, []);
+
+  const playError = useCallback(() => {
+    playTone(200, 0.2, 'sawtooth', 0.08);
+    setTimeout(() => playTone(150, 0.3, 'sawtooth', 0.06), 150);
+  }, []);
+
+  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playError };
 };

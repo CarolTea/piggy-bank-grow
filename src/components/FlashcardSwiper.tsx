@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { mockFlashcards, Flashcard } from '@/services/mockWeb3Services';
+import { useSound } from '@/hooks/useSound';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const FlashcardSwiper = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [exitX, setExitX] = useState(0);
+  const { playSwipe } = useSound();
 
   const card = mockFlashcards[currentIndex];
   const total = mockFlashcards.length;
 
   const handleSwipe = (direction: number) => {
+    playSwipe();
     setExitX(direction * 300);
     setTimeout(() => {
       setCurrentIndex(i => (i + (direction > 0 ? 1 : total - 1 + 1)) % total);

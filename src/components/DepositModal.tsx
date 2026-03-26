@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { useBalance } from '@/contexts/BalanceContext';
 import { useSound } from '@/hooks/useSound';
 import { mockDeposit } from '@/services/mockWeb3Services';
+import { PigSVG } from '@/components/EvolutionaryPig';
 import Confetti from './Confetti';
 import { ArrowDown, Zap, Check, Loader2 } from 'lucide-react';
 
@@ -23,7 +24,7 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
   const [step, setStep] = useState<'input' | 'processing' | 'success'>('input');
   const [showConfetti, setShowConfetti] = useState(false);
   const { addBalance } = useBalance();
-  const { playCoin, playSuccess } = useSound();
+  const { playDeposit, playClick } = useSound();
 
   const handleDeposit = async () => {
     const value = parseFloat(amount);
@@ -33,8 +34,7 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
     addBalance(value);
     setStep('success');
     setShowConfetti(true);
-    playSuccess();
-    setTimeout(() => playCoin(), 300);
+    playDeposit();
     setTimeout(() => {
       setShowConfetti(false);
       setStep('input');
@@ -91,7 +91,7 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
                       className={`flex-1 font-black border-border active:scale-90 transition-transform ${
                         amount === String(v) ? 'gradient-hot text-white border-0' : ''
                       }`}
-                      onClick={() => setAmount(String(v))}
+                      onClick={() => { playClick(); setAmount(String(v)); }}
                     >
                       R${v}
                     </Button>
@@ -143,8 +143,8 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
                 >
                   <Loader2 className="text-primary" size={48} />
                 </motion.div>
-                <p className="font-black text-lg">Processando...</p>
-                <p className="text-sm text-muted-foreground">Confirmando na rede em menos de 1s</p>
+                <p className="font-black text-lg">Processando na Solana...</p>
+                <p className="text-sm text-muted-foreground">Confirmando na rede em menos de 1s ⚡</p>
               </motion.div>
             )}
 
@@ -164,14 +164,13 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
                 >
                   <Check className="text-white" size={32} />
                 </motion.div>
-                <p className="font-black text-xl">Depósito Confirmado! 🎉</p>
+                <p className="font-black text-xl">Confirmado na Solana ⚡</p>
                 <p className="text-sm text-muted-foreground">R${amount} adicionados ao seu porquinho</p>
                 <motion.div
-                  className="text-5xl"
                   animate={{ y: [0, -20, 0], scale: [1, 1.3, 1], rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 0.8, repeat: 2 }}
                 >
-                  🐷
+                  <PigSVG size={80} />
                 </motion.div>
               </motion.div>
             )}
