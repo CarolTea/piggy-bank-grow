@@ -5,9 +5,9 @@ import { useSound } from '@/hooks/useSound';
 
 const tabs = [
   { icon: Home, label: 'Home', path: '/dashboard' },
-  { icon: Clock, label: 'Histórico', path: '/dashboard' },
+  { icon: Clock, label: 'Histórico', path: '/history' },
   { icon: GraduationCap, label: 'Educação', path: '/education' },
-  { icon: User, label: 'Perfil', path: '/dashboard' },
+  { icon: User, label: 'Perfil', path: '/profile' },
 ];
 
 const BottomNav = () => {
@@ -19,8 +19,7 @@ const BottomNav = () => {
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/80 backdrop-blur-xl border-t border-border">
       <div className="max-w-md mx-auto flex justify-around py-2">
         {tabs.map(tab => {
-          const active = pathname === tab.path && tab.label === 'Home' ? pathname === '/dashboard' :
-            tab.label === 'Educação' ? pathname === '/education' : false;
+          const active = pathname === tab.path;
           return (
             <button
               key={tab.label}

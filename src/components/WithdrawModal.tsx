@@ -4,9 +4,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useBalance } from '@/contexts/BalanceContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useSound } from '@/hooks/useSound';
 import { mockWithdraw } from '@/services/mockWeb3Services';
-import { ArrowUp, Loader2, Check, Zap } from 'lucide-react';
+import { ArrowUp, Loader2, Check, Zap, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   open: boolean;
@@ -15,20 +17,30 @@ interface Props {
 
 const WithdrawModal = ({ open, onOpenChange }: Props) => {
   const [amount, setAmount] = useState('');
-  const [pixKey, setPixKey] = useState('');
-  const [step, setStep] = useState<'input' | 'pixkey' | 'processing' | 'success'>('input');
+  const [step, setStep] = useState<'input' | 'confirm' | 'processing' | 'success' | 'nopix'>('input');
   const { balance, removeBalance } = useBalance();
+  const { user } = useAuth();
   const { playClick, playSuccess } = useSound();
+  const navigate = useNavigate();
+
+  const maskedPix = user?.pixKey
+    ? user.pixKey.length > 6
+      ? user.pixKey.slice(0, 3) + '***' + user.pixKey.slice(-3)
+      : '***'
+    : '';
 
   const handleContinue = () => {
     const value = parseFloat(amount);
     if (!value || value <= 0 || value > balance) return;
     playClick();
-    setStep('pixkey');
+    if (!user?.pixKey) {
+      setStep('nopix');
+      return;
+    }
+    setStep('confirm');
   };
 
   const handleWithdraw = async () => {
-    if (!pixKey.trim()) return;
     const value = parseFloat(amount);
     setStep('processing');
     await mockWithdraw(value);
@@ -38,7 +50,6 @@ const WithdrawModal = ({ open, onOpenChange }: Props) => {
     setTimeout(() => {
       setStep('input');
       setAmount('');
-      setPixKey('');
       onOpenChange(false);
     }, 2500);
   };
@@ -48,7 +59,6 @@ const WithdrawModal = ({ open, onOpenChange }: Props) => {
       onOpenChange(v);
       setStep('input');
       setAmount('');
-      setPixKey('');
     }
   };
 
@@ -91,25 +101,40 @@ const WithdrawModal = ({ open, onOpenChange }: Props) => {
             </motion.div>
           )}
 
-          {step === 'pixkey' && (
-            <motion.div key="pixkey" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="space-y-4">
-              <div>
-                <label className="text-sm font-bold text-muted-foreground">Chave PIX de destino</label>
-                <Input
-                  type="text"
-                  placeholder="CPF, e-mail, telefone ou chave aleatória"
-                  value={pixKey}
-                  onChange={e => setPixKey(e.target.value)}
-                  className="mt-1 h-12 bg-muted border-border font-semibold"
-                />
+          {step === 'nopix' && (
+            <motion.div key="nopix" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4 py-4">
+              <div className="flex flex-col items-center gap-3 text-center">
+                <AlertTriangle size={40} className="text-accent" />
+                <p className="font-black text-lg">Chave PIX não cadastrada</p>
+                <p className="text-sm text-muted-foreground">Para sua segurança, cadastre sua chave PIX no Perfil antes de sacar.</p>
+              </div>
+              <Button
+                className="w-full h-13 text-lg font-black rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-transform"
+                onClick={() => { handleClose(false); navigate('/profile'); }}
+              >
+                Ir para o Perfil
+              </Button>
+            </motion.div>
+          )}
+
+          {step === 'confirm' && (
+            <motion.div key="confirm" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+              <div className="bg-muted rounded-xl p-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Valor</span>
+                  <span className="font-black text-foreground">R${parseFloat(amount).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Chave PIX</span>
+                  <span className="font-bold text-foreground">{maskedPix}</span>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <Zap size={12} className="text-accent" /> Saque de R${amount} processado via Solana
+                <Zap size={12} className="text-accent" /> Processado via Solana → PIX
               </p>
               <Button
                 className="w-full h-13 text-lg font-black rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/90 active:scale-95 transition-transform"
                 onClick={handleWithdraw}
-                disabled={!pixKey.trim()}
               >
                 Confirmar Saque
               </Button>
