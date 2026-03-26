@@ -1,9 +1,16 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 const audioCtx = typeof window !== 'undefined' ? new (window.AudioContext || (window as any).webkitAudioContext)() : null;
 
+function resumeCtx() {
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
 function playTone(freq: number, duration: number, type: OscillatorType = 'sine', gain = 0.15) {
   if (!audioCtx) return;
+  resumeCtx();
   const osc = audioCtx.createOscillator();
   const g = audioCtx.createGain();
   osc.type = type;
@@ -13,6 +20,34 @@ function playTone(freq: number, duration: number, type: OscillatorType = 'sine',
   osc.connect(g).connect(audioCtx.destination);
   osc.start();
   osc.stop(audioCtx.currentTime + duration);
+}
+
+let ambientNodes: { oscs: OscillatorNode[]; gains: GainNode[] } | null = null;
+
+function startAmbientLoop() {
+  if (!audioCtx || ambientNodes) return;
+  resumeCtx();
+  const freqs = [261.63, 329.63, 392.00]; // C major chord
+  const oscs: OscillatorNode[] = [];
+  const gains: GainNode[] = [];
+  freqs.forEach(freq => {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    g.gain.value = 0.012;
+    osc.connect(g).connect(audioCtx.destination);
+    osc.start();
+    oscs.push(osc);
+    gains.push(g);
+  });
+  ambientNodes = { oscs, gains };
+}
+
+function stopAmbientLoop() {
+  if (!ambientNodes) return;
+  ambientNodes.oscs.forEach(osc => { try { osc.stop(); } catch {} });
+  ambientNodes = null;
 }
 
 export const useSound = () => {
@@ -47,11 +82,13 @@ export const useSound = () => {
   }, []);
 
   const playDeposit = useCallback(() => {
-    // Cha-ching sound
-    playTone(1200, 0.08, 'square', 0.08);
-    setTimeout(() => playTone(1600, 0.08, 'square', 0.08), 80);
-    setTimeout(() => playTone(2000, 0.12, 'square', 0.1), 160);
-    setTimeout(() => playTone(2400, 0.2, 'sine', 0.12), 260);
+    // Metallic cha-ching
+    resumeCtx();
+    playTone(1200, 0.06, 'square', 0.1);
+    setTimeout(() => playTone(1600, 0.06, 'square', 0.1), 70);
+    setTimeout(() => playTone(2000, 0.08, 'square', 0.12), 140);
+    setTimeout(() => playTone(2400, 0.1, 'sine', 0.14), 210);
+    setTimeout(() => playTone(3200, 0.15, 'sine', 0.1), 300);
   }, []);
 
   const playError = useCallback(() => {
@@ -59,5 +96,13 @@ export const useSound = () => {
     setTimeout(() => playTone(150, 0.3, 'sawtooth', 0.06), 150);
   }, []);
 
-  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playError };
+  const playAmbient = useCallback(() => {
+    startAmbientLoop();
+  }, []);
+
+  const stopAmbient = useCallback(() => {
+    stopAmbientLoop();
+  }, []);
+
+  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playError, playAmbient, stopAmbient };
 };
