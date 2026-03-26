@@ -279,6 +279,7 @@ const EvolutionaryPig = ({ animate = true }: Props) => {
           initial={{ scale: 0.3, opacity: 0, rotate: -15 }}
           animate={{ scale: 1, opacity: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 200, damping: 12 }}
+          className="relative z-10"
         >
           <PigSVG level={level} size={level.size} />
         </motion.div>
