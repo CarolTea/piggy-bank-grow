@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useBalance } from '@/contexts/BalanceContext';
@@ -8,7 +8,8 @@ import EvolutionaryPig from '@/components/EvolutionaryPig';
 import BottomNav from '@/components/BottomNav';
 import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
-import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap, Volume2, VolumeX } from 'lucide-react';
+import FlashcardPopup from '@/components/FlashcardPopup';
+import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const HeaderParticles = () => (
@@ -42,30 +43,21 @@ const HeaderParticles = () => (
 const Dashboard = () => {
   const { balance, dailyYield } = useBalance();
   const { user, logout } = useAuth();
-  const { playClick, playAmbient, stopAmbient } = useSound();
+  const { playClick } = useSound();
   const navigate = useNavigate();
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [flashcardOpen, setFlashcardOpen] = useState(false);
   const [displayBalance, setDisplayBalance] = useState(balance);
   const [streak] = useState(7);
-  const [muted, setMuted] = useState(false);
-  const ambientStarted = useRef(false);
 
-  // Start ambient on first user interaction
+  // Show a flashcard popup after 20s idle
   useEffect(() => {
-    if (muted) {
-      stopAmbient();
-      return;
-    }
-    const startAmbient = () => {
-      if (!ambientStarted.current) {
-        playAmbient();
-        ambientStarted.current = true;
-      }
-    };
-    window.addEventListener('click', startAmbient, { once: true });
-    return () => window.removeEventListener('click', startAmbient);
-  }, [muted, playAmbient, stopAmbient]);
+    const timer = setTimeout(() => {
+      setFlashcardOpen(true);
+    }, 20000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const diff = balance - displayBalance;
@@ -86,13 +78,8 @@ const Dashboard = () => {
   }, [balance]);
 
   const handleLogout = () => {
-    stopAmbient();
     logout();
     navigate('/');
-  };
-
-  const toggleMute = () => {
-    setMuted(m => !m);
   };
 
   return (
@@ -115,9 +102,6 @@ const Dashboard = () => {
                 <Flame size={14} className="text-accent" />
                 <span className="text-white font-black text-xs">{streak}</span>
               </motion.div>
-              <button onClick={toggleMute} className="text-white/60 hover:text-white transition-colors p-1">
-                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-              </button>
               <button onClick={handleLogout} className="text-white/60 hover:text-white transition-colors p-1">
                 <LogOut size={16} />
               </button>
@@ -229,8 +213,9 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
-      <DepositModal open={depositOpen} onOpenChange={setDepositOpen} />
+      <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={() => setFlashcardOpen(true)} />
       <WithdrawModal open={withdrawOpen} onOpenChange={setWithdrawOpen} />
+      <FlashcardPopup open={flashcardOpen} onOpenChange={setFlashcardOpen} />
       <BottomNav />
     </div>
   );

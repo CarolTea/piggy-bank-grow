@@ -239,26 +239,35 @@ const EvolutionaryPig = ({ animate = true }: Props) => {
           ease: 'easeInOut',
         }}
       >
-        {/* Circular backdrop for contrast */}
+        {/* Circular backdrop for contrast — no blur */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div
-            className="rounded-full backdrop-blur-sm"
+            className="rounded-full"
             style={{
               width: level.size * 0.9,
               height: level.size * 0.9,
-              background: 'rgba(255,255,255,0.2)',
+              background: 'rgba(255,255,255,0.22)',
             }}
           />
         </div>
 
-        {/* Glow behind pig */}
+        {/* Glow behind pig — separate layer, won't blur the SVG */}
         {level.glowColor && (
-          <motion.div
-            className="absolute inset-0 rounded-full blur-2xl"
-            style={{ background: level.glowColor, opacity: 0.25 }}
-            animate={{ opacity: [0.15, 0.35, 0.15], scale: [0.9, 1.1, 0.9] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          />
+          <div
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            style={{ zIndex: 0 }}
+          >
+            <motion.div
+              className="rounded-full"
+              style={{
+                width: level.size * 1.2,
+                height: level.size * 1.2,
+                background: `radial-gradient(circle, ${level.glowColor}40 0%, transparent 70%)`,
+              }}
+              animate={{ opacity: [0.5, 0.8, 0.5], scale: [0.95, 1.05, 0.95] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </div>
         )}
 
         {(level.extras === 'glow' || level.extras === 'crown') && (
@@ -270,6 +279,7 @@ const EvolutionaryPig = ({ animate = true }: Props) => {
           initial={{ scale: 0.3, opacity: 0, rotate: -15 }}
           animate={{ scale: 1, opacity: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 200, damping: 12 }}
+          className="relative z-10"
         >
           <PigSVG level={level} size={level.size} />
         </motion.div>

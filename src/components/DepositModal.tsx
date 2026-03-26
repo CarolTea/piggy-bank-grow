@@ -14,6 +14,7 @@ import { ArrowDown, Zap, Check, Loader2, Copy, QrCode } from 'lucide-react';
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 const QUICK_VALUES = [10, 50, 100, 500];
@@ -42,7 +43,7 @@ const MockQRCode = () => (
   </svg>
 );
 
-const DepositModal = ({ open, onOpenChange }: Props) => {
+const DepositModal = ({ open, onOpenChange, onSuccess }: Props) => {
   const [amount, setAmount] = useState('');
   const [autoPix, setAutoPix] = useState(false);
   const [step, setStep] = useState<'input' | 'pix' | 'processing' | 'success'>('input');
@@ -88,6 +89,8 @@ const DepositModal = ({ open, onOpenChange }: Props) => {
       setStep('input');
       setAmount('');
       onOpenChange(false);
+      // Trigger flashcard popup after deposit
+      setTimeout(() => onSuccess?.(), 300);
     }, 3000);
   };
 
