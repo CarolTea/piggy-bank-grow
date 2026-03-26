@@ -72,13 +72,22 @@ const WithdrawModal = ({ open, onOpenChange }: Props) => {
                 onChange={e => setAmount(e.target.value)}
                 className="text-2xl font-black h-14 text-center bg-muted border-border"
               />
-              <Button
-                className="w-full h-13 text-lg font-black rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/90 active:scale-95 transition-transform"
-                onClick={handleContinue}
-                disabled={!amount || parseFloat(amount) <= 0 || parseFloat(amount) > balance}
-              >
-                Continuar
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 h-13 text-sm font-black rounded-xl border-secondary text-secondary active:scale-95 transition-transform"
+                  onClick={() => { setAmount(balance.toFixed(2)); }}
+                >
+                  Sacar Tudo
+                </Button>
+                <Button
+                  className="flex-1 h-13 text-lg font-black rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/90 active:scale-95 transition-transform"
+                  onClick={handleContinue}
+                  disabled={!amount || parseFloat(amount) <= 0 || parseFloat(amount) > balance}
+                >
+                  Continuar
+                </Button>
+              </div>
             </motion.div>
           )}
 
