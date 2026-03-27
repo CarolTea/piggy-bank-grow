@@ -41,8 +41,8 @@ const LoginParticles = () => (
 
 const DEMO_BULLETS = [
   { icon: Shield, title: 'Auth invisível via Privy', desc: 'Login social cria sua carteira automaticamente. Sem seed phrase, sem extensão, sem complicação' },
-  { icon: QrCode, title: 'PIX → USDC via Bipa API', desc: 'Conversão PIX → USDC na Solana em D+2. Deposite R$10, R$50 ou R$500' },
-  { icon: ArrowRightLeft, title: 'Melhor rota via Jupiter V6', desc: 'Swap automático USDC → JitoSOL pela melhor rota e menor taxa do mercado' },
+  { icon: QrCode, title: 'PIX → USDC via Banxa', desc: 'Conversão PIX → USDC na Solana. Deposite R$10, R$50 ou R$500' },
+  { icon: ArrowRightLeft, title: 'Melhor rota via Jupiter Swap API', desc: 'Swap automático USDC → JitoSOL pela melhor rota e menor taxa do mercado' },
   { icon: TrendingUp, title: 'JitoSOL: ~7.5–8.5% ao ano', desc: 'Liquid Staking nativo da Solana. Rendimento de validação sem Impermanent Loss' },
   { icon: GraduationCap, title: 'Gamificação que educa', desc: 'Porquinho evolui conforme você poupa, com flashcards de educação financeira' },
   { icon: Wallet, title: 'Só cobramos quando você ganha', desc: 'Performance fee de 15% sobre o yield. Sem mensalidade, sem barreira de entrada' },
