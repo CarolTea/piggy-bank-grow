@@ -51,7 +51,7 @@ const FlashcardPopup = ({ open, onOpenChange, flashcard }: Props) => {
     <>
       <Confetti active={showConfetti} />
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-xs mx-auto rounded-3xl bg-card border-border p-0 overflow-hidden">
+        <DialogContent className="max-w-xs mx-auto rounded-3xl bg-card border-border p-0 overflow-hidden data-[state=closed]:duration-100 data-[state=closed]:animate-none">
           <AnimatePresence>
             {open && (
               <motion.div

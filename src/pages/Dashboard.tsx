@@ -11,7 +11,7 @@ import WithdrawModal from '@/components/WithdrawModal';
 import FlashcardPopup from '@/components/FlashcardPopup';
 import EarningsEntryAnimation from '@/components/EarningsEntryAnimation';
 import LevelUpAnimation from '@/components/LevelUpAnimation';
-import { getPigLevel } from '@/components/EvolutionaryPig';
+import { getPigLevel, PIG_LEVELS } from '@/components/EvolutionaryPig';
 import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap, Volume2, VolumeX, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -44,7 +44,7 @@ const HeaderParticles = () => (
   </>
 );
 
-type OverlayType = 'earnings' | 'levelup' | 'flashcard';
+type OverlayType = 'earnings' | 'levelup' | 'leveldown' | 'flashcard';
 
 const COOLDOWN_MS = 800; // pause between overlays
 
@@ -68,12 +68,13 @@ const Dashboard = () => {
 
   // Overlay orchestration
   const [activeOverlay, setActiveOverlay] = useState<OverlayType | null>('earnings');
-  const [levelUpData, setLevelUpData] = useState<{ oldLevel: any; newLevel: any } | null>(null);
+  const [levelUpData, setLevelUpData] = useState<{ oldLevel: any; newLevel: any; direction?: 'up' | 'down' } | null>(null);
+  const [levelDirection, setLevelDirection] = useState<'up' | 'down'>('up');
   const prevLevelRef = useRef(getPigLevel(balance));
   const isFirstRender = useRef(true);
   const pendingQueue = useRef<OverlayType[]>([]);
   const flowBusy = useRef(true); // starts busy because earnings is active
-  const pendingLevelUp = useRef<{ oldLevel: any; newLevel: any } | null>(null);
+  const pendingLevelUp = useRef<{ oldLevel: any; newLevel: any; direction?: 'up' | 'down' } | null>(null);
 
   // Enqueue an overlay, preventing duplicates
   const enqueueOverlay = useCallback((type: OverlayType) => {
@@ -83,14 +84,16 @@ const Dashboard = () => {
   }, [activeOverlay]);
 
   // Show next overlay from queue with cooldown
-  const showNextOverlay = useCallback(() => {
+  const showNextOverlay = useCallback((skipCooldown = false) => {
     flowBusy.current = true;
+    const delay = skipCooldown ? 50 : COOLDOWN_MS;
     setTimeout(() => {
       if (pendingQueue.current.length > 0) {
         const next = pendingQueue.current.shift()!;
-        // If it's levelup, apply the stored data
-        if (next === 'levelup' && pendingLevelUp.current) {
+        // If it's levelup/leveldown, apply the stored data
+        if ((next === 'levelup' || next === 'leveldown') && pendingLevelUp.current) {
           setLevelUpData(pendingLevelUp.current);
+          setLevelDirection(pendingLevelUp.current.direction);
           pendingLevelUp.current = null;
         }
         setActiveOverlay(next);
@@ -98,7 +101,7 @@ const Dashboard = () => {
         setActiveOverlay(null);
         flowBusy.current = false;
       }
-    }, COOLDOWN_MS);
+    }, delay);
   }, []);
 
   // Detect level changes — store pending, don't show immediately
@@ -109,9 +112,12 @@ const Dashboard = () => {
     }
     const newLevel = getPigLevel(balance);
     if (prevLevelRef.current.label !== newLevel.label) {
-      pendingLevelUp.current = { oldLevel: prevLevelRef.current, newLevel };
+      const oldIdx = PIG_LEVELS.indexOf(prevLevelRef.current);
+      const newIdx = PIG_LEVELS.indexOf(newLevel);
+      const dir: 'up' | 'down' = newIdx >= oldIdx ? 'up' : 'down';
+      pendingLevelUp.current = { oldLevel: prevLevelRef.current, newLevel, direction: dir };
       prevLevelRef.current = newLevel;
-      enqueueOverlay('levelup');
+      enqueueOverlay(dir === 'up' ? 'levelup' : 'leveldown');
     }
   }, [balance, enqueueOverlay]);
 
@@ -332,14 +338,15 @@ const Dashboard = () => {
 
       <EarningsEntryAnimation show={activeOverlay === 'earnings'} onComplete={showNextOverlay} />
       <LevelUpAnimation
-        show={activeOverlay === 'levelup'}
+        show={activeOverlay === 'levelup' || activeOverlay === 'leveldown'}
         oldLevel={levelUpData?.oldLevel || null}
         newLevel={levelUpData?.newLevel || null}
+        direction={levelDirection}
         onComplete={() => { setLevelUpData(null); showNextOverlay(); }}
       />
       <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={handleDepositComplete} />
       <WithdrawModal open={withdrawOpen} onOpenChange={setWithdrawOpen} />
-      <FlashcardPopup open={activeOverlay === 'flashcard'} onOpenChange={(open) => { if (!open) showNextOverlay(); }} />
+      <FlashcardPopup open={activeOverlay === 'flashcard'} onOpenChange={(open) => { if (!open) showNextOverlay(true); }} />
       <BottomNav />
     </div>
   );

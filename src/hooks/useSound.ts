@@ -113,6 +113,10 @@ export const useSound = () => {
     playFile('/sounds/card_entry.wav');
   }, []);
 
+  const playLevelDown = useCallback(() => {
+    playFile('/sounds/porquinho_voltou_de_nivel.mp3', 0.6);
+  }, []);
+
   const playAppOpen = useCallback(() => {
     playFile('/sounds/abriu_o_app.wav');
   }, []);
@@ -140,5 +144,5 @@ export const useSound = () => {
     return getBgMusic().volume;
   }, []);
 
-  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, startBgMusic, stopBgMusic, setBgVolume, getBgVolume, muted, toggleMute };
+  return { playCoin, playLevelUp, playLevelDown, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, startBgMusic, stopBgMusic, setBgVolume, getBgVolume, muted, toggleMute };
 };
