@@ -1,60 +1,54 @@
 
-Objetivo: criar uma experiência própria para quando o porquinho cai de nível e fazer o flashcard fechar de forma realmente imediata ao tocar em “Entendi”.
 
-1. Diferenciar subida vs queda de nível
-- Ajustar `Dashboard.tsx` para detectar se a troca de nível foi promoção ou regressão.
-- Em vez de tratar tudo como `levelup`, guardar um tipo de transição, por exemplo:
-  - `levelup`
-  - `leveldown`
-- Continuar usando a fila existente, mas enfileirar o evento correto conforme o saldo subir ou descer.
+# Modo Demo vs Experiência na tela de Login
 
-2. Criar uma animação específica de regressão
-- Evoluir `LevelUpAnimation.tsx` para suportar dois modos, ou separar em um novo componente dedicado.
-- Para regressão:
-  - trocar título, mensagem e clima visual
-  - inverter a direção visual da transição do porquinho
-  - remover confete/festa
-  - usar um tom mais suave de “atenção” em vez de celebração
-- Mensagem sugerida:
-  - “Seu porquinho voltou de nível”
-  - “Faça um novo depósito para evoluir novamente”
+## O que muda
 
-3. Tocar a música enviada na regressão
-- Adicionar o arquivo `porquinho_voltou_de_nível.mp3` em `public/sounds/`.
-- Expandir `useSound.ts` com uma função dedicada, por exemplo `playLevelDown`.
-- Na animação de regressão, tocar esse áudio no momento principal da transição.
+Na tela de Login (`Login.tsx`), adicionar uma **chave seletora (Switch)** no topo com duas opções: **Demo** e **Experiência**.
 
-4. Conectar regressão ao saque
-- Hoje o saque só altera saldo e fecha o modal.
-- O `Dashboard` já observa mudanças de nível por saldo, então com a nova distinção ele poderá disparar automaticamente a animação de regressão após uma retirada que reduza o nível.
-- Manter a mesma cadência do app: sucesso do saque primeiro, depois regressão, sem sobreposição.
+- **Experiência** (padrão): tela de login atual, sem alterações.
+- **Demo**: substitui os botões de login por uma seção informativa com bullets extraídos do pitch, explicando a tecnologia e os objetivos do SmartPig.
 
-5. Fazer o flashcard sair sem sensação de atraso
-- O clique já chama `onOpenChange(false)`, mas ainda há atraso percebido por dois motivos:
-  - o `Dialog` do Radix tem animação de fechamento
-  - o `Dashboard` aplica `COOLDOWN_MS` antes da próxima etapa
-- Ajustar `FlashcardPopup.tsx` para fechar com saída mais curta ou sem animação perceptível no clique do botão.
-- Ajustar `Dashboard.tsx` para permitir avanço imediato quando o overlay fechado for o flashcard, sem esperar o cooldown padrão.
-- Resultado esperado: tocou em “Entendi”, o card desaparece praticamente na hora.
+## Conteúdo da seção Demo
 
-6. Arquivos a alterar
-- `src/pages/Dashboard.tsx`
-  - distinguir promoção e regressão
-  - enfileirar `leveldown`
-  - pular cooldown após fechamento do flashcard
-- `src/components/LevelUpAnimation.tsx`
-  - suportar variante de regressão com texto, visual e timing próprios
-- `src/hooks/useSound.ts`
-  - adicionar `playLevelDown`
-- `src/components/FlashcardPopup.tsx`
-  - reduzir/eliminar a sensação de atraso ao fechar
-- `src/components/WithdrawModal.tsx`
-  - provavelmente sem grande refatoração, apenas validar que a cadência continua correta
-- `public/sounds/porquinho_voltou_de_nível.mp3`
-  - novo áudio da regressão
+Bullets baseados no pitch:
 
-Detalhes técnicos
-- Hoje a diferença entre subir e cair de nível não existe: o código compara apenas `prevLevelRef.current.label !== newLevel.label`.
-- A forma correta é comparar a posição do nível antigo e do novo em `PIG_LEVELS`.
-- O atraso do flashcard não está só no botão: o `DialogContent` também anima `data-[state=closed]`, e o `Dashboard` ainda espera `COOLDOWN_MS = 800` antes de seguir.
-- A correção mais segura é tratar o fechamento do flashcard como “close now”, separado do cooldown usado entre grandes experiências.
+1. **O primeiro cofre digital** — Transforma o PIX em rendimento DeFi, sem que o usuário precise entender DeFi
+2. **Web3 invisível** — Sem carteira, seed phrase, gas ou protocolo. O porquinho faz o resto
+3. **PIX como on-ramp** — Deposite R$10, R$50 ou R$500 via PIX em segundos
+4. **Rendimento automático** — Alocação em JitoSOL na Solana, 5.87% ao ano
+5. **Gamificação que educa** — Porquinho evolui conforme você poupa, com flashcards financeiros
+6. **Alinhamento de incentivos** — Só cobramos quando você ganha (performance fee sobre o yield)
+
+Abaixo dos bullets, um botão "Entrar na Experiência" que muda o toggle para o modo Experiência (mostrando os botões de login).
+
+## Layout
+
+```text
+┌─────────────────────────┐
+│      [Demo | Experiência]│  ← Switch/Toggle no topo
+│                         │
+│      🐷 (porquinho)     │
+│      Smart Pig          │
+│                         │
+│  ── se Demo ──          │
+│  • bullet 1             │
+│  • bullet 2             │
+│  • bullet 3 ...         │
+│  [Entrar na Experiência]│
+│                         │
+│  ── se Experiência ──   │
+│  [Google] [Apple] [Email]│
+│                         │
+│   Powered by Solana ⚡   │
+└─────────────────────────┘
+```
+
+## Detalhes técnicos
+
+- Arquivo alterado: `src/pages/Login.tsx`
+- Usar um `useState<'demo' | 'experience'>` com default `'demo'` para controlar o modo
+- Usar o componente `Switch` ou dois botões estilizados como toggle
+- Bullets com ícones Lucide relevantes (Wallet, Eye, Zap, TrendingUp, GraduationCap, Shield)
+- Animação com framer-motion ao alternar entre modos
+
