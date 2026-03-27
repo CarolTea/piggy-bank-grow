@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSound } from '@/hooks/useSound';
 import { PigSVG } from '@/components/EvolutionaryPig';
 import Confetti from './Confetti';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles, ArrowRight, ArrowDown } from 'lucide-react';
 
 interface PigLevelInfo {
   label: string;
@@ -20,11 +20,12 @@ interface Props {
   show: boolean;
   oldLevel: PigLevelInfo | null;
   newLevel: PigLevelInfo | null;
+  direction?: 'up' | 'down';
   onComplete: () => void;
 }
 
-const LevelUpAnimation = ({ show, oldLevel, newLevel, onComplete }: Props) => {
-  const { playLevelUp } = useSound();
+const LevelUpAnimation = ({ show, oldLevel, newLevel, direction = 'up', onComplete }: Props) => {
+  const { playLevelUp, playLevelDown } = useSound();
   const [step, setStep] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -35,11 +36,17 @@ const LevelUpAnimation = ({ show, oldLevel, newLevel, onComplete }: Props) => {
       return;
     }
 
+    const isDown = direction === 'down';
+
     const t1 = setTimeout(() => setStep(1), 300);
     const t2 = setTimeout(() => {
       setStep(2);
-      playLevelUp();
-      setShowConfetti(true);
+      if (isDown) {
+        playLevelDown();
+      } else {
+        playLevelUp();
+        setShowConfetti(true);
+      }
     }, 1500);
     const t3 = setTimeout(() => setStep(3), 2500);
     const t4 = setTimeout(() => {
@@ -57,9 +64,15 @@ const LevelUpAnimation = ({ show, oldLevel, newLevel, onComplete }: Props) => {
 
   if (!oldLevel || !newLevel) return null;
 
+  const isDown = direction === 'down';
+
+  const bgStyle = isDown
+    ? 'linear-gradient(145deg, hsl(220 30% 12% / 0.97), hsl(200 20% 15% / 0.97), hsl(240 20% 10% / 0.97))'
+    : 'linear-gradient(145deg, hsl(280 60% 12% / 0.97), hsl(320 70% 15% / 0.97), hsl(260 50% 10% / 0.97))';
+
   return (
     <>
-      <Confetti active={showConfetti} />
+      {!isDown && <Confetti active={showConfetti} />}
       <AnimatePresence>
         {show && (
           <motion.div
@@ -67,7 +80,7 @@ const LevelUpAnimation = ({ show, oldLevel, newLevel, onComplete }: Props) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{ background: 'linear-gradient(145deg, hsl(280 60% 12% / 0.97), hsl(320 70% 15% / 0.97), hsl(260 50% 10% / 0.97))' }}
+            style={{ background: bgStyle }}
           >
             {/* Radial glow */}
             <motion.div
@@ -75,7 +88,9 @@ const LevelUpAnimation = ({ show, oldLevel, newLevel, onComplete }: Props) => {
               style={{
                 width: 300,
                 height: 300,
-                background: `radial-gradient(circle, ${newLevel.glowColor || newLevel.bodyColor}30 0%, transparent 70%)`,
+                background: isDown
+                  ? `radial-gradient(circle, hsl(220 30% 40% / 0.2) 0%, transparent 70%)`
+                  : `radial-gradient(circle, ${newLevel.glowColor || newLevel.bodyColor}30 0%, transparent 70%)`,
               }}
               animate={{ scale: [0.8, 1.3, 0.8], opacity: [0.3, 0.6, 0.3] }}
               transition={{ duration: 2, repeat: Infinity }}
@@ -88,9 +103,19 @@ const LevelUpAnimation = ({ show, oldLevel, newLevel, onComplete }: Props) => {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-2"
               >
-                <Sparkles className="text-accent" size={22} />
-                <p className="text-white font-black text-xl">Evolução!</p>
-                <Sparkles className="text-accent" size={22} />
+                {isDown ? (
+                  <>
+                    <ArrowDown className="text-muted-foreground" size={22} />
+                    <p className="text-white font-black text-xl">Ops…</p>
+                    <ArrowDown className="text-muted-foreground" size={22} />
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="text-accent" size={22} />
+                    <p className="text-white font-black text-xl">Evolução!</p>
+                    <Sparkles className="text-accent" size={22} />
+                  </>
+                )}
               </motion.div>
 
               {/* Pig transition */}
@@ -115,27 +140,31 @@ const LevelUpAnimation = ({ show, oldLevel, newLevel, onComplete }: Props) => {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <ArrowRight className="text-accent" size={28} />
+                    {isDown ? (
+                      <ArrowDown className="text-muted-foreground" size={28} />
+                    ) : (
+                      <ArrowRight className="text-accent" size={28} />
+                    )}
                   </motion.div>
                 )}
 
                 {/* New pig */}
                 {step >= 2 && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.3, rotate: -20 }}
+                    initial={{ opacity: 0, scale: 0.3, rotate: isDown ? 10 : -20 }}
                     animate={{ opacity: 1, scale: 1, rotate: 0 }}
                     transition={{ type: 'spring', stiffness: 200, damping: 12 }}
                     className="flex flex-col items-center"
                   >
                     <motion.div
-                      animate={{ y: [0, -10, 0] }}
+                      animate={isDown ? { y: [0, 4, 0] } : { y: [0, -10, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
                     >
-                      <PigSVG level={newLevel as any} size={140} />
+                      <PigSVG level={newLevel as any} size={isDown ? 110 : 140} />
                     </motion.div>
                     <motion.p
                       className="text-white font-black text-base mt-1"
-                      style={{ textShadow: `0 0 20px ${newLevel.glowColor || newLevel.bodyColor}80` }}
+                      style={isDown ? {} : { textShadow: `0 0 20px ${newLevel.glowColor || newLevel.bodyColor}80` }}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.3 }}
@@ -151,10 +180,12 @@ const LevelUpAnimation = ({ show, oldLevel, newLevel, onComplete }: Props) => {
                 <motion.div
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-2xl text-center"
+                  className={`backdrop-blur-sm px-6 py-3 rounded-2xl text-center ${isDown ? 'bg-white/5' : 'bg-white/10'}`}
                 >
                   <p className="text-white/80 text-sm font-bold">
-                    🎉 Seu porquinho evoluiu! Continue poupando!
+                    {isDown
+                      ? '😢 Seu porquinho voltou de nível. Deposite para evoluir novamente!'
+                      : '🎉 Seu porquinho evoluiu! Continue poupando!'}
                   </p>
                 </motion.div>
               )}
