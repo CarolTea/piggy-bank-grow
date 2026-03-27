@@ -53,8 +53,7 @@ export const useSound = () => {
   }, []);
 
   const playCoin = useCallback(() => {
-    playTone(880, 0.1, 'square', 0.1);
-    setTimeout(() => playTone(1175, 0.15, 'square', 0.1), 100);
+    playFile('/sounds/som_moeda.mp3');
   }, []);
 
   const playLevelUp = useCallback(() => {
