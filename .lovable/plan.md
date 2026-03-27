@@ -1,43 +1,35 @@
 
 
-# Tela de Perfil + Histórico + PIX Integrado ao Saque
+# Integrar Sons WAV Customizados
 
 ## Resumo
-Criar duas novas páginas (Perfil e Histórico), salvar a chave PIX no perfil do usuário, e fazer o saque usar automaticamente essa chave cadastrada — eliminando o passo manual de digitar a chave e prevenindo fraudes.
+Substituir sons sintetizados por 3 arquivos WAV reais enviados pelo usuário, mapeados pelo nome:
+
+| Arquivo | Onde usar | Substitui |
+|---------|-----------|-----------|
+| `abriu_o_app.wav` | Ao abrir o app (Login → Dashboard) | `playSuccess` no Login |
+| `porquinho_aumentou_mudou_de_nivel.wav` | Quando o porquinho sobe de nível | `playLevelUp` no EvolutionaryPig |
+| `entrada_do_card.wav` | Quando o flashcard popup aparece | `playCelebration` no FlashcardPopup |
 
 ## Mudanças
 
-### 1. Tela de Perfil (`src/pages/Profile.tsx`) — nova
-- Header com avatar (iniciais do nome), nome e e-mail do usuário
-- Campo para cadastrar/editar chave PIX (CPF, e-mail, telefone ou aleatória)
-- Botão "Salvar" que persiste a chave no AuthContext
-- Seção com wallet address (truncado)
-- Botão de logout
+### 1. Copiar arquivos para `public/sounds/`
+- `abriu_o_app.wav` → `public/sounds/abriu_o_app.wav`
+- `porquinho_aumentou_mudou_de_nivel.wav` → `public/sounds/level_up.wav`
+- `entrada_do_card.wav` → `public/sounds/card_entry.wav`
 
-### 2. Tela de Histórico (`src/pages/History.tsx`) — nova
-- Lista de transações usando `mockTransactionHistory()`
-- Cada item mostra: ícone (depósito verde ↓, saque vermelho ↑, yield dourado ⚡), valor, data formatada e status
-- Visual tipo timeline com cards estilizados
-- Mensagem "Nenhuma transação" se vazio
+### 2. Atualizar `src/hooks/useSound.ts`
+- Criar helper `playFile(path)` que usa `new Audio(path).play()`
+- `playLevelUp` → toca `/sounds/level_up.wav`
+- `playCelebration` → toca `/sounds/card_entry.wav`
+- Adicionar novo `playAppOpen` → toca `/sounds/abriu_o_app.wav`
+- Manter os demais sons sintetizados (click, nav, deposit, etc.)
 
-### 3. Salvar PIX no contexto (`src/contexts/AuthContext.tsx`)
-- Adicionar `pixKey: string` ao estado do user e `setPixKey` ao contexto
-- Persistir no estado (mock, sem backend)
+### 3. Atualizar `src/pages/Login.tsx`
+- Importar e usar `playAppOpen` em vez de `playSuccess` no handleLogin
 
-### 4. Saque usa chave do perfil (`src/components/WithdrawModal.tsx`)
-- Remover o passo `pixkey` do modal
-- Ao sacar, verificar se `user.pixKey` existe; se não, mostrar aviso "Cadastre sua chave PIX no Perfil"
-- Se existe, mostrar a chave cadastrada (mascarada) e pedir apenas confirmação
-
-### 5. Rotas e navegação
-- `src/App.tsx` — adicionar rotas `/profile` e `/history`
-- `src/components/BottomNav.tsx` — atualizar paths: Histórico → `/history`, Perfil → `/profile`, corrigir lógica de `active`
-
-## Arquivos
-1. `src/pages/Profile.tsx` — **novo**
-2. `src/pages/History.tsx` — **novo**
-3. `src/contexts/AuthContext.tsx` — adicionar pixKey + setPixKey
-4. `src/components/WithdrawModal.tsx` — usar pixKey do contexto
-5. `src/App.tsx` — novas rotas
-6. `src/components/BottomNav.tsx` — corrigir paths
+### Arquivos modificados
+1. `public/sounds/` — 3 arquivos WAV copiados
+2. `src/hooks/useSound.ts` — helper playFile + substituir 3 sons
+3. `src/pages/Login.tsx` — usar playAppOpen
 
