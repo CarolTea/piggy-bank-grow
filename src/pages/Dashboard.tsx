@@ -10,6 +10,8 @@ import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import FlashcardPopup from '@/components/FlashcardPopup';
 import EarningsEntryAnimation from '@/components/EarningsEntryAnimation';
+import LevelUpAnimation from '@/components/LevelUpAnimation';
+import { getPigLevel } from '@/components/EvolutionaryPig';
 import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -53,6 +55,22 @@ const Dashboard = () => {
   const [streak] = useState(7);
   const [showEarningsEntry, setShowEarningsEntry] = useState(true);
   const flashcardShownRef = useRef(false);
+  const [levelUpData, setLevelUpData] = useState<{ oldLevel: any; newLevel: any } | null>(null);
+  const prevLevelRef = useRef(getPigLevel(balance));
+  const isFirstRender = useRef(true);
+
+  // Detect level changes on balance update
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const newLevel = getPigLevel(balance);
+    if (prevLevelRef.current.label !== newLevel.label) {
+      setLevelUpData({ oldLevel: prevLevelRef.current, newLevel });
+      prevLevelRef.current = newLevel;
+    }
+  }, [balance]);
 
   // Show a flashcard popup after 20s idle — only once
   useEffect(() => {
@@ -224,7 +242,20 @@ const Dashboard = () => {
       </div>
 
       <EarningsEntryAnimation show={showEarningsEntry} onComplete={() => setShowEarningsEntry(false)} />
-      <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={() => { if (!flashcardShownRef.current) { setFlashcardOpen(true); flashcardShownRef.current = true; } }} />
+      {levelUpData && (
+        <LevelUpAnimation
+          show={!!levelUpData}
+          oldLevel={levelUpData.oldLevel}
+          newLevel={levelUpData.newLevel}
+          onComplete={() => setLevelUpData(null)}
+        />
+      )}
+      <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={() => {
+        if (!flashcardShownRef.current) {
+          setFlashcardOpen(true);
+          flashcardShownRef.current = true;
+        }
+      }} />
       <WithdrawModal open={withdrawOpen} onOpenChange={setWithdrawOpen} />
       <FlashcardPopup open={flashcardOpen} onOpenChange={setFlashcardOpen} />
       <BottomNav />

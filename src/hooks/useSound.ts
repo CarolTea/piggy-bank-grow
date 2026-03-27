@@ -32,10 +32,10 @@ function playTone(freq: number, duration: number, type: OscillatorType = 'sine',
   osc.stop(audioCtx.currentTime + duration);
 }
 
-function playFile(path: string) {
+function playFile(path: string, volume = 0.5) {
   if (globalMuted) return;
   const audio = new Audio(path);
-  audio.volume = 0.5;
+  audio.volume = volume;
   audio.play().catch(() => {});
 }
 
@@ -53,7 +53,7 @@ export const useSound = () => {
   }, []);
 
   const playCoin = useCallback(() => {
-    playFile('/sounds/som_moeda.mp3');
+    playFile('/sounds/som_moeda.mp3', 0.8);
   }, []);
 
   const playLevelUp = useCallback(() => {
