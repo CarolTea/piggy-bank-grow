@@ -22,6 +22,12 @@ function playTone(freq: number, duration: number, type: OscillatorType = 'sine',
   osc.stop(audioCtx.currentTime + duration);
 }
 
+function playFile(path: string) {
+  const audio = new Audio(path);
+  audio.volume = 0.5;
+  audio.play().catch(() => {});
+}
+
 export const useSound = () => {
   const playCoin = useCallback(() => {
     playTone(880, 0.1, 'square', 0.1);
@@ -29,10 +35,7 @@ export const useSound = () => {
   }, []);
 
   const playLevelUp = useCallback(() => {
-    playTone(523, 0.12, 'square', 0.1);
-    setTimeout(() => playTone(659, 0.12, 'square', 0.1), 120);
-    setTimeout(() => playTone(784, 0.12, 'square', 0.1), 240);
-    setTimeout(() => playTone(1047, 0.2, 'square', 0.1), 360);
+    playFile('/sounds/level_up.wav');
   }, []);
 
   const playSuccess = useCallback(() => {
@@ -68,23 +71,12 @@ export const useSound = () => {
   }, []);
 
   const playCelebration = useCallback(() => {
-    resumeCtx();
-    // Party horn ascending fanfare
-    playTone(523, 0.1, 'square', 0.1);
-    setTimeout(() => playTone(659, 0.1, 'square', 0.1), 80);
-    setTimeout(() => playTone(784, 0.1, 'square', 0.1), 160);
-    setTimeout(() => playTone(1047, 0.15, 'square', 0.12), 240);
-    // Sparkle high tones
-    setTimeout(() => playTone(2093, 0.08, 'sine', 0.08), 400);
-    setTimeout(() => playTone(2637, 0.08, 'sine', 0.06), 480);
-    setTimeout(() => playTone(3136, 0.1, 'sine', 0.05), 560);
-    // Final triumphant chord
-    setTimeout(() => {
-      playTone(1047, 0.3, 'sine', 0.08);
-      playTone(1318, 0.3, 'sine', 0.06);
-      playTone(1568, 0.3, 'sine', 0.06);
-    }, 650);
+    playFile('/sounds/card_entry.wav');
   }, []);
 
-  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playError, playCelebration };
+  const playAppOpen = useCallback(() => {
+    playFile('/sounds/abriu_o_app.wav');
+  }, []);
+
+  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playError, playCelebration, playAppOpen };
 };

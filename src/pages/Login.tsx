@@ -41,14 +41,14 @@ const LoginParticles = () => (
 
 const Login = () => {
   const { login, isLoading } = useAuth();
-  const { playSuccess } = useSound();
+  const { playAppOpen } = useSound();
   const navigate = useNavigate();
   const [showEmail, setShowEmail] = useState(false);
   const [email, setEmail] = useState('');
 
   const handleLogin = async (method: 'google' | 'apple' | 'email') => {
     await login(method, method === 'email' ? email : undefined);
-    playSuccess();
+    playAppOpen();
     navigate('/dashboard');
   };
 
