@@ -50,14 +50,25 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
-  const [flashcardOpen, setFlashcardOpen] = useState(false);
   const [displayBalance, setDisplayBalance] = useState(balance);
   const [streak] = useState(7);
-  const [showEarningsEntry, setShowEarningsEntry] = useState(true);
-  const flashcardShownRef = useRef(false);
+
+  // Animation queue: only one overlay at a time
+  const [activeOverlay, setActiveOverlay] = useState<'earnings' | 'levelup' | 'flashcard' | null>('earnings');
   const [levelUpData, setLevelUpData] = useState<{ oldLevel: any; newLevel: any } | null>(null);
   const prevLevelRef = useRef(getPigLevel(balance));
   const isFirstRender = useRef(true);
+  const pendingQueue = useRef<Array<'levelup' | 'flashcard'>>([]);
+  const flashcardShownRef = useRef(false);
+
+  const showNextOverlay = useCallback(() => {
+    if (pendingQueue.current.length > 0) {
+      const next = pendingQueue.current.shift()!;
+      setActiveOverlay(next);
+    } else {
+      setActiveOverlay(null);
+    }
+  }, []);
 
   // Detect level changes on balance update
   useEffect(() => {
@@ -69,6 +80,12 @@ const Dashboard = () => {
     if (prevLevelRef.current.label !== newLevel.label) {
       setLevelUpData({ oldLevel: prevLevelRef.current, newLevel });
       prevLevelRef.current = newLevel;
+      // Queue level-up animation
+      if (activeOverlay) {
+        pendingQueue.current.push('levelup');
+      } else {
+        setActiveOverlay('levelup');
+      }
     }
   }, [balance]);
 
