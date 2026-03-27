@@ -6,10 +6,28 @@ const audioCtx = typeof window !== 'undefined' ? new (window.AudioContext || (wi
 let globalMuted = typeof window !== 'undefined' ? localStorage.getItem('smartpig_muted') === 'true' : false;
 const muteListeners = new Set<(muted: boolean) => void>();
 
+// Background music singleton
+let bgMusic: HTMLAudioElement | null = null;
+function getBgMusic(): HTMLAudioElement {
+  if (!bgMusic) {
+    bgMusic = new Audio('/sounds/musica_ambiente.mp3');
+    bgMusic.loop = true;
+    bgMusic.volume = 0.08; // very low so it doesn't compete
+  }
+  return bgMusic;
+}
+
 function setGlobalMuted(muted: boolean) {
   globalMuted = muted;
   if (typeof window !== 'undefined') localStorage.setItem('smartpig_muted', String(muted));
   muteListeners.forEach(fn => fn(muted));
+  // Sync bg music
+  const bg = getBgMusic();
+  if (muted) {
+    bg.pause();
+  } else if (!bg.paused === false) {
+    // will be resumed by startBgMusic if it was playing
+  }
 }
 
 function resumeCtx() {
@@ -99,5 +117,19 @@ export const useSound = () => {
     playFile('/sounds/abriu_o_app.wav');
   }, []);
 
-  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, muted, toggleMute };
+  const startBgMusic = useCallback(() => {
+    if (globalMuted) return;
+    const bg = getBgMusic();
+    if (bg.paused) {
+      bg.play().catch(() => {});
+    }
+  }, []);
+
+  const stopBgMusic = useCallback(() => {
+    const bg = getBgMusic();
+    bg.pause();
+    bg.currentTime = 0;
+  }, []);
+
+  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, startBgMusic, stopBgMusic, muted, toggleMute };
 };
