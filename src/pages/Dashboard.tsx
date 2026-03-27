@@ -251,12 +251,7 @@ const Dashboard = () => {
         />
       )}
       <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={() => {
-        // Check for level up
-        const newLevel = getPigLevel(balance);
-        if (prevLevelRef.current.label !== newLevel.label) {
-          setLevelUpData({ oldLevel: prevLevelRef.current, newLevel });
-          prevLevelRef.current = newLevel;
-        } else if (!flashcardShownRef.current) {
+        if (!flashcardShownRef.current) {
           setFlashcardOpen(true);
           flashcardShownRef.current = true;
         }
