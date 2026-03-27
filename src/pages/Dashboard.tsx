@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useBalance } from '@/contexts/BalanceContext';
@@ -9,6 +9,7 @@ import BottomNav from '@/components/BottomNav';
 import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import FlashcardPopup from '@/components/FlashcardPopup';
+import EarningsEntryAnimation from '@/components/EarningsEntryAnimation';
 import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -50,11 +51,17 @@ const Dashboard = () => {
   const [flashcardOpen, setFlashcardOpen] = useState(false);
   const [displayBalance, setDisplayBalance] = useState(balance);
   const [streak] = useState(7);
+  const [showEarningsEntry, setShowEarningsEntry] = useState(true);
+  const flashcardShownRef = useRef(false);
 
-  // Show a flashcard popup after 20s idle
+  // Show a flashcard popup after 20s idle — only once
   useEffect(() => {
+    if (flashcardShownRef.current) return;
     const timer = setTimeout(() => {
-      setFlashcardOpen(true);
+      if (!flashcardShownRef.current) {
+        setFlashcardOpen(true);
+        flashcardShownRef.current = true;
+      }
     }, 20000);
     return () => clearTimeout(timer);
   }, []);
@@ -216,7 +223,8 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
-      <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={() => setFlashcardOpen(true)} />
+      <EarningsEntryAnimation show={showEarningsEntry} onComplete={() => setShowEarningsEntry(false)} />
+      <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={() => { if (!flashcardShownRef.current) { setFlashcardOpen(true); flashcardShownRef.current = true; } }} />
       <WithdrawModal open={withdrawOpen} onOpenChange={setWithdrawOpen} />
       <FlashcardPopup open={flashcardOpen} onOpenChange={setFlashcardOpen} />
       <BottomNav />
