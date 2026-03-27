@@ -152,7 +152,7 @@ const Login = () => {
         className="flex items-center gap-2 mt-8 text-white/50 text-xs relative z-10"
       >
         <Zap size={14} />
-        <p className="font-semibold">Protegido pela rede Solana — rápida, segura e sem taxas</p>
+        <p className="font-semibold">Powered by Solana ⚡</p>
       </motion.div>
     </div>
   );
