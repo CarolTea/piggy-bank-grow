@@ -57,6 +57,20 @@ const Dashboard = () => {
   const flashcardShownRef = useRef(false);
   const [levelUpData, setLevelUpData] = useState<{ oldLevel: any; newLevel: any } | null>(null);
   const prevLevelRef = useRef(getPigLevel(balance));
+  const isFirstRender = useRef(true);
+
+  // Detect level changes on balance update
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const newLevel = getPigLevel(balance);
+    if (prevLevelRef.current.label !== newLevel.label) {
+      setLevelUpData({ oldLevel: prevLevelRef.current, newLevel });
+      prevLevelRef.current = newLevel;
+    }
+  }, [balance]);
 
   // Show a flashcard popup after 20s idle — only once
   useEffect(() => {
