@@ -1,54 +1,24 @@
 
 
-# Modo Demo vs Experiência na tela de Login
+# Atualizar bullets Demo com stack técnico real do pitch
 
 ## O que muda
 
-Na tela de Login (`Login.tsx`), adicionar uma **chave seletora (Switch)** no topo com duas opções: **Demo** e **Experiência**.
+Reescrever o array `DEMO_BULLETS` em `src/pages/Login.tsx` (linhas 42-49) para refletir fielmente o stack descrito no pitch, com as tecnologias corretas e APY atualizado.
 
-- **Experiência** (padrão): tela de login atual, sem alterações.
-- **Demo**: substitui os botões de login por uma seção informativa com bullets extraídos do pitch, explicando a tecnologia e os objetivos do SmartPig.
+## Novos bullets
 
-## Conteúdo da seção Demo
-
-Bullets baseados no pitch:
-
-1. **O primeiro cofre digital** — Transforma o PIX em rendimento DeFi, sem que o usuário precise entender DeFi
-2. **Web3 invisível** — Sem carteira, seed phrase, gas ou protocolo. O porquinho faz o resto
-3. **PIX como on-ramp** — Deposite R$10, R$50 ou R$500 via PIX em segundos
-4. **Rendimento automático** — Alocação em JitoSOL na Solana, 5.87% ao ano
-5. **Gamificação que educa** — Porquinho evolui conforme você poupa, com flashcards financeiros
-6. **Alinhamento de incentivos** — Só cobramos quando você ganha (performance fee sobre o yield)
-
-Abaixo dos bullets, um botão "Entrar na Experiência" que muda o toggle para o modo Experiência (mostrando os botões de login).
-
-## Layout
-
-```text
-┌─────────────────────────┐
-│      [Demo | Experiência]│  ← Switch/Toggle no topo
-│                         │
-│      🐷 (porquinho)     │
-│      Smart Pig          │
-│                         │
-│  ── se Demo ──          │
-│  • bullet 1             │
-│  • bullet 2             │
-│  • bullet 3 ...         │
-│  [Entrar na Experiência]│
-│                         │
-│  ── se Experiência ──   │
-│  [Google] [Apple] [Email]│
-│                         │
-│   Powered by Solana ⚡   │
-└─────────────────────────┘
-```
+1. **Auth invisível via Privy** (icon: `Shield`) — "Login social cria sua carteira automaticamente. Sem seed phrase, sem extensão, sem complicação"
+2. **PIX → USDC via Bipa API** (icon: `QrCode`) — "Conversão PIX → USDC na Solana em D+2. Deposite R$10, R$50 ou R$500"
+3. **Melhor rota via Jupiter V6** (icon: `ArrowRightLeft`) — "Swap automático USDC → JitoSOL pela melhor rota e menor taxa do mercado"
+4. **JitoSOL: ~7.5–8.5% ao ano** (icon: `TrendingUp`) — "Liquid Staking nativo da Solana. Rendimento de validação sem Impermanent Loss"
+5. **Gamificação que educa** (icon: `GraduationCap`) — "Porquinho evolui conforme você poupa, com flashcards de educação financeira"
+6. **Só cobramos quando você ganha** (icon: `Wallet`) — "Performance fee de 15% sobre o yield. Sem mensalidade, sem barreira de entrada"
 
 ## Detalhes técnicos
 
-- Arquivo alterado: `src/pages/Login.tsx`
-- Usar um `useState<'demo' | 'experience'>` com default `'demo'` para controlar o modo
-- Usar o componente `Switch` ou dois botões estilizados como toggle
-- Bullets com ícones Lucide relevantes (Wallet, Eye, Zap, TrendingUp, GraduationCap, Shield)
-- Animação com framer-motion ao alternar entre modos
+- Arquivo: `src/pages/Login.tsx`
+- Adicionar import `ArrowRightLeft` do Lucide (substituir `EyeOff`)
+- Atualizar o array `DEMO_BULLETS` com os 6 novos itens
+- Remover imports não utilizados (`EyeOff`)
 
