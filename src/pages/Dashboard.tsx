@@ -89,17 +89,21 @@ const Dashboard = () => {
     }
   }, [balance]);
 
-  // Show a flashcard popup after 20s idle — only once
+  // Show a flashcard popup after 20s idle — only once, and only if no overlay active
   useEffect(() => {
     if (flashcardShownRef.current) return;
     const timer = setTimeout(() => {
       if (!flashcardShownRef.current) {
-        setFlashcardOpen(true);
         flashcardShownRef.current = true;
+        if (activeOverlay) {
+          pendingQueue.current.push('flashcard');
+        } else {
+          setActiveOverlay('flashcard');
+        }
       }
     }, 20000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [activeOverlay]);
 
   useEffect(() => {
     const diff = balance - displayBalance;
@@ -258,23 +262,25 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
-      <EarningsEntryAnimation show={showEarningsEntry} onComplete={() => setShowEarningsEntry(false)} />
-      {levelUpData && (
-        <LevelUpAnimation
-          show={!!levelUpData}
-          oldLevel={levelUpData.oldLevel}
-          newLevel={levelUpData.newLevel}
-          onComplete={() => setLevelUpData(null)}
-        />
-      )}
+      <EarningsEntryAnimation show={activeOverlay === 'earnings'} onComplete={showNextOverlay} />
+      <LevelUpAnimation
+        show={activeOverlay === 'levelup'}
+        oldLevel={levelUpData?.oldLevel || null}
+        newLevel={levelUpData?.newLevel || null}
+        onComplete={() => { setLevelUpData(null); showNextOverlay(); }}
+      />
       <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={() => {
         if (!flashcardShownRef.current) {
-          setFlashcardOpen(true);
           flashcardShownRef.current = true;
+          if (activeOverlay) {
+            pendingQueue.current.push('flashcard');
+          } else {
+            setActiveOverlay('flashcard');
+          }
         }
       }} />
       <WithdrawModal open={withdrawOpen} onOpenChange={setWithdrawOpen} />
-      <FlashcardPopup open={flashcardOpen} onOpenChange={setFlashcardOpen} />
+      <FlashcardPopup open={activeOverlay === 'flashcard'} onOpenChange={(open) => { if (!open) showNextOverlay(); }} />
       <BottomNav />
     </div>
   );
