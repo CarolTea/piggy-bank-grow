@@ -84,14 +84,18 @@ const DepositModal = ({ open, onOpenChange, onSuccess }: Props) => {
     setStep('success');
     setShowConfetti(true);
     playDeposit();
+    // Let the user enjoy the PIX success animation fully
     setTimeout(() => {
       setShowConfetti(false);
+    }, 2500);
+    // Close modal and notify dashboard AFTER the full experience
+    setTimeout(() => {
       setStep('input');
       setAmount('');
       onOpenChange(false);
-      // Trigger flashcard popup after deposit
-      setTimeout(() => onSuccess?.(), 300);
-    }, 3000);
+      // Notify dashboard that deposit flow is truly complete
+      setTimeout(() => onSuccess?.(), 500);
+    }, 3500);
   };
 
   const handleConfirmAmount = () => {

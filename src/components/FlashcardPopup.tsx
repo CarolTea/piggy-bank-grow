@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -17,10 +17,17 @@ const getRandomFlashcard = (): Flashcard => {
 };
 
 const FlashcardPopup = ({ open, onOpenChange, flashcard }: Props) => {
-  const card = flashcard || getRandomFlashcard();
   const { playCelebration } = useSound();
   const [showConfetti, setShowConfetti] = useState(false);
   const [hasPlayedEntry, setHasPlayedEntry] = useState(false);
+  // Lock card on open to prevent re-rolls during re-renders
+  const lockedCard = useRef<Flashcard | null>(null);
+
+  if (open && !lockedCard.current) {
+    lockedCard.current = flashcard || getRandomFlashcard();
+  }
+
+  const card = lockedCard.current || getRandomFlashcard();
 
   // Play sound on flashcard entry
   useEffect(() => {
@@ -30,6 +37,7 @@ const FlashcardPopup = ({ open, onOpenChange, flashcard }: Props) => {
     }
     if (!open) {
       setHasPlayedEntry(false);
+      lockedCard.current = null;
     }
   }, [open, hasPlayedEntry, playCelebration]);
 

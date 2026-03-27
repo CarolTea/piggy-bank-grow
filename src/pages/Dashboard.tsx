@@ -43,6 +43,10 @@ const HeaderParticles = () => (
   </>
 );
 
+type OverlayType = 'earnings' | 'levelup' | 'flashcard';
+
+const COOLDOWN_MS = 800; // pause between overlays
+
 const Dashboard = () => {
   const { balance, dailyYield } = useBalance();
   const { user, logout } = useAuth();
@@ -53,24 +57,42 @@ const Dashboard = () => {
   const [displayBalance, setDisplayBalance] = useState(balance);
   const [streak] = useState(7);
 
-  // Animation queue: only one overlay at a time
-  const [activeOverlay, setActiveOverlay] = useState<'earnings' | 'levelup' | 'flashcard' | null>('earnings');
+  // Overlay orchestration
+  const [activeOverlay, setActiveOverlay] = useState<OverlayType | null>('earnings');
   const [levelUpData, setLevelUpData] = useState<{ oldLevel: any; newLevel: any } | null>(null);
   const prevLevelRef = useRef(getPigLevel(balance));
   const isFirstRender = useRef(true);
-  const pendingQueue = useRef<Array<'levelup' | 'flashcard'>>([]);
-  const flashcardShownRef = useRef(false);
+  const pendingQueue = useRef<OverlayType[]>([]);
+  const flowBusy = useRef(true); // starts busy because earnings is active
+  const pendingLevelUp = useRef<{ oldLevel: any; newLevel: any } | null>(null);
 
+  // Enqueue an overlay, preventing duplicates
+  const enqueueOverlay = useCallback((type: OverlayType) => {
+    if (activeOverlay === type) return;
+    if (pendingQueue.current.includes(type)) return;
+    pendingQueue.current.push(type);
+  }, [activeOverlay]);
+
+  // Show next overlay from queue with cooldown
   const showNextOverlay = useCallback(() => {
-    if (pendingQueue.current.length > 0) {
-      const next = pendingQueue.current.shift()!;
-      setActiveOverlay(next);
-    } else {
-      setActiveOverlay(null);
-    }
+    flowBusy.current = true;
+    setTimeout(() => {
+      if (pendingQueue.current.length > 0) {
+        const next = pendingQueue.current.shift()!;
+        // If it's levelup, apply the stored data
+        if (next === 'levelup' && pendingLevelUp.current) {
+          setLevelUpData(pendingLevelUp.current);
+          pendingLevelUp.current = null;
+        }
+        setActiveOverlay(next);
+      } else {
+        setActiveOverlay(null);
+        flowBusy.current = false;
+      }
+    }, COOLDOWN_MS);
   }, []);
 
-  // Detect level changes on balance update
+  // Detect level changes — store pending, don't show immediately
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -78,33 +100,43 @@ const Dashboard = () => {
     }
     const newLevel = getPigLevel(balance);
     if (prevLevelRef.current.label !== newLevel.label) {
-      setLevelUpData({ oldLevel: prevLevelRef.current, newLevel });
+      pendingLevelUp.current = { oldLevel: prevLevelRef.current, newLevel };
       prevLevelRef.current = newLevel;
-      // Queue level-up animation
-      if (activeOverlay) {
-        pendingQueue.current.push('levelup');
-      } else {
-        setActiveOverlay('levelup');
-      }
+      enqueueOverlay('levelup');
     }
-  }, [balance]);
+  }, [balance, enqueueOverlay]);
 
-  // Show a flashcard popup after 20s idle — only once, and only if no overlay active
+  // Flashcard idle timer — only when no flow is active
   useEffect(() => {
-    if (flashcardShownRef.current) return;
+    // Don't start timer if flow is busy
+    if (flowBusy.current || activeOverlay) return;
+
     const timer = setTimeout(() => {
-      if (!flashcardShownRef.current) {
-        flashcardShownRef.current = true;
-        if (activeOverlay) {
-          pendingQueue.current.push('flashcard');
-        } else {
+      if (!flowBusy.current && !activeOverlay) {
+        enqueueOverlay('flashcard');
+        // Trigger it since nothing is active
+        if (!activeOverlay) {
           setActiveOverlay('flashcard');
+          flowBusy.current = true;
         }
       }
     }, 20000);
     return () => clearTimeout(timer);
-  }, [activeOverlay]);
+  }, [activeOverlay, enqueueOverlay]);
 
+  // Handle deposit completion: queue levelup (if pending) then flashcard
+  const handleDepositComplete = useCallback(() => {
+    // levelup was already enqueued by the balance effect
+    // just add flashcard after it
+    enqueueOverlay('flashcard');
+
+    // If nothing is currently showing, kick off the queue
+    if (!activeOverlay) {
+      showNextOverlay();
+    }
+  }, [activeOverlay, enqueueOverlay, showNextOverlay]);
+
+  // Balance counter animation
   useEffect(() => {
     const diff = balance - displayBalance;
     if (Math.abs(diff) < 0.001) return;
@@ -269,16 +301,7 @@ const Dashboard = () => {
         newLevel={levelUpData?.newLevel || null}
         onComplete={() => { setLevelUpData(null); showNextOverlay(); }}
       />
-      <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={() => {
-        if (!flashcardShownRef.current) {
-          flashcardShownRef.current = true;
-          if (activeOverlay) {
-            pendingQueue.current.push('flashcard');
-          } else {
-            setActiveOverlay('flashcard');
-          }
-        }
-      }} />
+      <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={handleDepositComplete} />
       <WithdrawModal open={withdrawOpen} onOpenChange={setWithdrawOpen} />
       <FlashcardPopup open={activeOverlay === 'flashcard'} onOpenChange={(open) => { if (!open) showNextOverlay(); }} />
       <BottomNav />
