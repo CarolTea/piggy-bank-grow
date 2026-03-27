@@ -43,10 +43,8 @@ const FlashcardPopup = ({ open, onOpenChange, flashcard }: Props) => {
 
   const handleConfirm = () => {
     setShowConfetti(true);
-    setTimeout(() => {
-      setShowConfetti(false);
-      onOpenChange(false);
-    }, 2000);
+    onOpenChange(false);
+    setTimeout(() => setShowConfetti(false), 1500);
   };
 
   return (
