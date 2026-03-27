@@ -9,7 +9,7 @@ import BottomNav from '@/components/BottomNav';
 import DepositModal from '@/components/DepositModal';
 import WithdrawModal from '@/components/WithdrawModal';
 import FlashcardPopup from '@/components/FlashcardPopup';
-import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap } from 'lucide-react';
+import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const HeaderParticles = () => (
@@ -43,7 +43,7 @@ const HeaderParticles = () => (
 const Dashboard = () => {
   const { balance, dailyYield } = useBalance();
   const { user, logout } = useAuth();
-  const { playClick } = useSound();
+  const { playClick, muted, toggleMute } = useSound();
   const navigate = useNavigate();
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
@@ -102,6 +102,9 @@ const Dashboard = () => {
                 <Flame size={14} className="text-accent" />
                 <span className="text-white font-black text-xs">{streak}</span>
               </motion.div>
+              <button onClick={toggleMute} className="text-white/60 hover:text-white transition-colors p-1">
+                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
               <button onClick={handleLogout} className="text-white/60 hover:text-white transition-colors p-1">
                 <LogOut size={16} />
               </button>
