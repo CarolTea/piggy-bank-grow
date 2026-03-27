@@ -6,7 +6,7 @@ import { useSound } from '@/hooks/useSound';
 import { PigSVG } from '@/components/EvolutionaryPig';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Mail, Zap, Wallet, EyeOff, QrCode, TrendingUp, GraduationCap, Shield } from 'lucide-react';
+import { Loader2, Mail, Zap, Wallet, QrCode, TrendingUp, GraduationCap, Shield, ArrowRightLeft } from 'lucide-react';
 
 const LoginParticles = () => (
   <>
@@ -40,12 +40,12 @@ const LoginParticles = () => (
 );
 
 const DEMO_BULLETS = [
-  { icon: Wallet, title: 'O primeiro cofre digital', desc: 'Transforma o PIX em rendimento DeFi, sem que você precise entender DeFi' },
-  { icon: EyeOff, title: 'Web3 invisível', desc: 'Sem carteira, seed phrase, gas ou protocolo. O porquinho faz o resto' },
-  { icon: QrCode, title: 'PIX como on-ramp', desc: 'Deposite R$10, R$50 ou R$500 via PIX em segundos' },
-  { icon: TrendingUp, title: 'Rendimento automático', desc: 'Alocação em JitoSOL na Solana, 5.87% ao ano' },
-  { icon: GraduationCap, title: 'Gamificação que educa', desc: 'Porquinho evolui conforme você poupa, com flashcards financeiros' },
-  { icon: Shield, title: 'Alinhamento de incentivos', desc: 'Só cobramos quando você ganha (performance fee sobre o yield)' },
+  { icon: Shield, title: 'Auth invisível via Privy', desc: 'Login social cria sua carteira automaticamente. Sem seed phrase, sem extensão, sem complicação' },
+  { icon: QrCode, title: 'PIX → USDC via Bipa API', desc: 'Conversão PIX → USDC na Solana em D+2. Deposite R$10, R$50 ou R$500' },
+  { icon: ArrowRightLeft, title: 'Melhor rota via Jupiter V6', desc: 'Swap automático USDC → JitoSOL pela melhor rota e menor taxa do mercado' },
+  { icon: TrendingUp, title: 'JitoSOL: ~7.5–8.5% ao ano', desc: 'Liquid Staking nativo da Solana. Rendimento de validação sem Impermanent Loss' },
+  { icon: GraduationCap, title: 'Gamificação que educa', desc: 'Porquinho evolui conforme você poupa, com flashcards de educação financeira' },
+  { icon: Wallet, title: 'Só cobramos quando você ganha', desc: 'Performance fee de 15% sobre o yield. Sem mensalidade, sem barreira de entrada' },
 ];
 
 const Login = () => {
