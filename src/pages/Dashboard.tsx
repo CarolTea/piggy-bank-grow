@@ -68,13 +68,13 @@ const Dashboard = () => {
 
   // Overlay orchestration
   const [activeOverlay, setActiveOverlay] = useState<OverlayType | null>('earnings');
-  const [levelUpData, setLevelUpData] = useState<{ oldLevel: any; newLevel: any } | null>(null);
+  const [levelUpData, setLevelUpData] = useState<{ oldLevel: any; newLevel: any; direction?: 'up' | 'down' } | null>(null);
   const [levelDirection, setLevelDirection] = useState<'up' | 'down'>('up');
   const prevLevelRef = useRef(getPigLevel(balance));
   const isFirstRender = useRef(true);
   const pendingQueue = useRef<OverlayType[]>([]);
   const flowBusy = useRef(true); // starts busy because earnings is active
-  const pendingLevelUp = useRef<{ oldLevel: any; newLevel: any } | null>(null);
+  const pendingLevelUp = useRef<{ oldLevel: any; newLevel: any; direction?: 'up' | 'down' } | null>(null);
 
   // Enqueue an overlay, preventing duplicates
   const enqueueOverlay = useCallback((type: OverlayType) => {
