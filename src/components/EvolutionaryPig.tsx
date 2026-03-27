@@ -16,7 +16,7 @@ interface PigLevel {
   glowColor?: string;
 }
 
-const PIG_LEVELS: PigLevel[] = [
+export const PIG_LEVELS: PigLevel[] = [
   { label: 'Porquinho Bebê', minBalance: 0, maxBalance: 100, size: 140, bodyColor: '#FFB6C8', snoutColor: '#FF8FAB', cheekColor: '#FF6B8A', eyeStyle: 'cute', extras: 'none' },
   { label: 'Porquinho Esperto', minBalance: 100, maxBalance: 500, size: 150, bodyColor: '#FFA0BB', snoutColor: '#FF7BAA', cheekColor: '#FF5C8A', eyeStyle: 'smart', extras: 'glasses' },
   { label: 'Porquinho Forte', minBalance: 500, maxBalance: 1000, size: 155, bodyColor: '#E84393', snoutColor: '#D63384', cheekColor: '#C2185B', eyeStyle: 'fierce', extras: 'bandana' },
@@ -24,7 +24,7 @@ const PIG_LEVELS: PigLevel[] = [
   { label: 'Porquinho Rei', minBalance: 5000, maxBalance: Infinity, size: 165, bodyColor: '#FFD700', snoutColor: '#F0C000', cheekColor: '#FFB300', eyeStyle: 'royal', extras: 'crown', glowColor: '#FF6B35' },
 ];
 
-const getPigLevel = (balance: number): PigLevel => {
+export const getPigLevel = (balance: number): PigLevel => {
   return [...PIG_LEVELS].reverse().find(l => balance >= l.minBalance) || PIG_LEVELS[0];
 };
 
