@@ -131,5 +131,14 @@ export const useSound = () => {
     bg.currentTime = 0;
   }, []);
 
-  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, startBgMusic, stopBgMusic, muted, toggleMute };
+  const setBgVolume = useCallback((vol: number) => {
+    const bg = getBgMusic();
+    bg.volume = Math.max(0, Math.min(1, vol));
+  }, []);
+
+  const getBgVolume = useCallback(() => {
+    return getBgMusic().volume;
+  }, []);
+
+  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, startBgMusic, stopBgMusic, setBgVolume, getBgVolume, muted, toggleMute };
 };
