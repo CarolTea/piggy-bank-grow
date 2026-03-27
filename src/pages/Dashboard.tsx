@@ -50,7 +50,13 @@ const COOLDOWN_MS = 800; // pause between overlays
 const Dashboard = () => {
   const { balance, dailyYield } = useBalance();
   const { user, logout } = useAuth();
-  const { playClick, muted, toggleMute } = useSound();
+  const { playClick, muted, toggleMute, startBgMusic, stopBgMusic } = useSound();
+
+  // Start background music on mount
+  useEffect(() => {
+    startBgMusic();
+    return () => stopBgMusic();
+  }, [startBgMusic, stopBgMusic]);
   const navigate = useNavigate();
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
