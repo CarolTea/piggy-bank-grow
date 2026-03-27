@@ -1,6 +1,16 @@
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect, createContext, useContext } from 'react';
 
 const audioCtx = typeof window !== 'undefined' ? new (window.AudioContext || (window as any).webkitAudioContext)() : null;
+
+// Global mute state
+let globalMuted = typeof window !== 'undefined' ? localStorage.getItem('smartpig_muted') === 'true' : false;
+const muteListeners = new Set<(muted: boolean) => void>();
+
+function setGlobalMuted(muted: boolean) {
+  globalMuted = muted;
+  if (typeof window !== 'undefined') localStorage.setItem('smartpig_muted', String(muted));
+  muteListeners.forEach(fn => fn(muted));
+}
 
 function resumeCtx() {
   if (audioCtx && audioCtx.state === 'suspended') {
@@ -9,7 +19,7 @@ function resumeCtx() {
 }
 
 function playTone(freq: number, duration: number, type: OscillatorType = 'sine', gain = 0.15) {
-  if (!audioCtx) return;
+  if (!audioCtx || globalMuted) return;
   resumeCtx();
   const osc = audioCtx.createOscillator();
   const g = audioCtx.createGain();
@@ -23,12 +33,25 @@ function playTone(freq: number, duration: number, type: OscillatorType = 'sine',
 }
 
 function playFile(path: string) {
+  if (globalMuted) return;
   const audio = new Audio(path);
   audio.volume = 0.5;
   audio.play().catch(() => {});
 }
 
 export const useSound = () => {
+  const [muted, setMuted] = useState(globalMuted);
+
+  useEffect(() => {
+    const listener = (m: boolean) => setMuted(m);
+    muteListeners.add(listener);
+    return () => { muteListeners.delete(listener); };
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    setGlobalMuted(!globalMuted);
+  }, []);
+
   const playCoin = useCallback(() => {
     playTone(880, 0.1, 'square', 0.1);
     setTimeout(() => playTone(1175, 0.15, 'square', 0.1), 100);
@@ -57,12 +80,11 @@ export const useSound = () => {
   }, []);
 
   const playDeposit = useCallback(() => {
-    resumeCtx();
-    playTone(1200, 0.06, 'square', 0.1);
-    setTimeout(() => playTone(1600, 0.06, 'square', 0.1), 70);
-    setTimeout(() => playTone(2000, 0.08, 'square', 0.12), 140);
-    setTimeout(() => playTone(2400, 0.1, 'sine', 0.14), 210);
-    setTimeout(() => playTone(3200, 0.15, 'sine', 0.1), 300);
+    playFile('/sounds/pix_in_completo.mp3');
+  }, []);
+
+  const playWithdraw = useCallback(() => {
+    playFile('/sounds/pix_out_complete.wav');
   }, []);
 
   const playError = useCallback(() => {
@@ -78,5 +100,5 @@ export const useSound = () => {
     playFile('/sounds/abriu_o_app.wav');
   }, []);
 
-  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playError, playCelebration, playAppOpen };
+  return { playCoin, playLevelUp, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, muted, toggleMute };
 };

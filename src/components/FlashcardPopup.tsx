@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -20,9 +20,20 @@ const FlashcardPopup = ({ open, onOpenChange, flashcard }: Props) => {
   const card = flashcard || getRandomFlashcard();
   const { playCelebration } = useSound();
   const [showConfetti, setShowConfetti] = useState(false);
+  const [hasPlayedEntry, setHasPlayedEntry] = useState(false);
+
+  // Play sound on flashcard entry
+  useEffect(() => {
+    if (open && !hasPlayedEntry) {
+      playCelebration();
+      setHasPlayedEntry(true);
+    }
+    if (!open) {
+      setHasPlayedEntry(false);
+    }
+  }, [open, hasPlayedEntry, playCelebration]);
 
   const handleConfirm = () => {
-    playCelebration();
     setShowConfetti(true);
     setTimeout(() => {
       setShowConfetti(false);

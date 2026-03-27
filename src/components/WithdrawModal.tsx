@@ -20,7 +20,7 @@ const WithdrawModal = ({ open, onOpenChange }: Props) => {
   const [step, setStep] = useState<'input' | 'confirm' | 'processing' | 'success' | 'nopix'>('input');
   const { balance, removeBalance } = useBalance();
   const { user } = useAuth();
-  const { playClick, playSuccess } = useSound();
+  const { playClick, playWithdraw } = useSound();
   const navigate = useNavigate();
 
   const maskedPix = user?.pixKey
@@ -45,7 +45,7 @@ const WithdrawModal = ({ open, onOpenChange }: Props) => {
     setStep('processing');
     await mockWithdraw(value);
     removeBalance(value);
-    playSuccess();
+    playWithdraw();
     setStep('success');
     setTimeout(() => {
       setStep('input');
