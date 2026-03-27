@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useBalance } from '@/contexts/BalanceContext';
@@ -50,14 +50,25 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
-  const [flashcardOpen, setFlashcardOpen] = useState(false);
   const [displayBalance, setDisplayBalance] = useState(balance);
   const [streak] = useState(7);
-  const [showEarningsEntry, setShowEarningsEntry] = useState(true);
-  const flashcardShownRef = useRef(false);
+
+  // Animation queue: only one overlay at a time
+  const [activeOverlay, setActiveOverlay] = useState<'earnings' | 'levelup' | 'flashcard' | null>('earnings');
   const [levelUpData, setLevelUpData] = useState<{ oldLevel: any; newLevel: any } | null>(null);
   const prevLevelRef = useRef(getPigLevel(balance));
   const isFirstRender = useRef(true);
+  const pendingQueue = useRef<Array<'levelup' | 'flashcard'>>([]);
+  const flashcardShownRef = useRef(false);
+
+  const showNextOverlay = useCallback(() => {
+    if (pendingQueue.current.length > 0) {
+      const next = pendingQueue.current.shift()!;
+      setActiveOverlay(next);
+    } else {
+      setActiveOverlay(null);
+    }
+  }, []);
 
   // Detect level changes on balance update
   useEffect(() => {
@@ -69,20 +80,30 @@ const Dashboard = () => {
     if (prevLevelRef.current.label !== newLevel.label) {
       setLevelUpData({ oldLevel: prevLevelRef.current, newLevel });
       prevLevelRef.current = newLevel;
+      // Queue level-up animation
+      if (activeOverlay) {
+        pendingQueue.current.push('levelup');
+      } else {
+        setActiveOverlay('levelup');
+      }
     }
   }, [balance]);
 
-  // Show a flashcard popup after 20s idle — only once
+  // Show a flashcard popup after 20s idle — only once, and only if no overlay active
   useEffect(() => {
     if (flashcardShownRef.current) return;
     const timer = setTimeout(() => {
       if (!flashcardShownRef.current) {
-        setFlashcardOpen(true);
         flashcardShownRef.current = true;
+        if (activeOverlay) {
+          pendingQueue.current.push('flashcard');
+        } else {
+          setActiveOverlay('flashcard');
+        }
       }
     }, 20000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [activeOverlay]);
 
   useEffect(() => {
     const diff = balance - displayBalance;
@@ -241,23 +262,25 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
-      <EarningsEntryAnimation show={showEarningsEntry} onComplete={() => setShowEarningsEntry(false)} />
-      {levelUpData && (
-        <LevelUpAnimation
-          show={!!levelUpData}
-          oldLevel={levelUpData.oldLevel}
-          newLevel={levelUpData.newLevel}
-          onComplete={() => setLevelUpData(null)}
-        />
-      )}
+      <EarningsEntryAnimation show={activeOverlay === 'earnings'} onComplete={showNextOverlay} />
+      <LevelUpAnimation
+        show={activeOverlay === 'levelup'}
+        oldLevel={levelUpData?.oldLevel || null}
+        newLevel={levelUpData?.newLevel || null}
+        onComplete={() => { setLevelUpData(null); showNextOverlay(); }}
+      />
       <DepositModal open={depositOpen} onOpenChange={setDepositOpen} onSuccess={() => {
         if (!flashcardShownRef.current) {
-          setFlashcardOpen(true);
           flashcardShownRef.current = true;
+          if (activeOverlay) {
+            pendingQueue.current.push('flashcard');
+          } else {
+            setActiveOverlay('flashcard');
+          }
         }
       }} />
       <WithdrawModal open={withdrawOpen} onOpenChange={setWithdrawOpen} />
-      <FlashcardPopup open={flashcardOpen} onOpenChange={setFlashcardOpen} />
+      <FlashcardPopup open={activeOverlay === 'flashcard'} onOpenChange={(open) => { if (!open) showNextOverlay(); }} />
       <BottomNav />
     </div>
   );
