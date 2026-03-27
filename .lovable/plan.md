@@ -1,101 +1,60 @@
 
-# Ajustar a cadência pós-depósito
+Objetivo: criar uma experiência própria para quando o porquinho cai de nível e fazer o flashcard fechar de forma realmente imediata ao tocar em “Entendi”.
 
-## Objetivo
-Garantir uma experiência em sequência, sem sobreposição:
-```text
-PIX confirmado
-→ pausa curta
-→ animação de mudança de nível (se houver)
-→ pausa curta
-→ 1 flashcard
-```
+1. Diferenciar subida vs queda de nível
+- Ajustar `Dashboard.tsx` para detectar se a troca de nível foi promoção ou regressão.
+- Em vez de tratar tudo como `levelup`, guardar um tipo de transição, por exemplo:
+  - `levelup`
+  - `leveldown`
+- Continuar usando a fila existente, mas enfileirar o evento correto conforme o saldo subir ou descer.
 
-## Causa do problema atual
-Hoje os eventos são disparados por caminhos diferentes e acabam concorrendo:
-- `addBalance()` roda antes de a experiência do PIX terminar, então o `Dashboard` detecta level-up cedo demais.
-- O flashcard é enfileirado separadamente no `onSuccess` do depósito.
-- O timer de 20s também pode enfileirar flashcard enquanto outra experiência ainda está acontecendo.
-- O `FlashcardPopup` escolhe o card com `getRandomFlashcard()` a cada render, o que pode parecer “dois cards”.
+2. Criar uma animação específica de regressão
+- Evoluir `LevelUpAnimation.tsx` para suportar dois modos, ou separar em um novo componente dedicado.
+- Para regressão:
+  - trocar título, mensagem e clima visual
+  - inverter a direção visual da transição do porquinho
+  - remover confete/festa
+  - usar um tom mais suave de “atenção” em vez de celebração
+- Mensagem sugerida:
+  - “Seu porquinho voltou de nível”
+  - “Faça um novo depósito para evoluir novamente”
 
-## Plano de implementação
+3. Tocar a música enviada na regressão
+- Adicionar o arquivo `porquinho_voltou_de_nível.mp3` em `public/sounds/`.
+- Expandir `useSound.ts` com uma função dedicada, por exemplo `playLevelDown`.
+- Na animação de regressão, tocar esse áudio no momento principal da transição.
 
-### 1. Centralizar o fluxo no `Dashboard`
-Refatorar o controle atual de overlays para um fluxo único de experiência:
-- criar um estado/ref para “flow ativo” (`entry`, `deposit`, `levelup`, `flashcard`)
-- criar fila com itens estruturados, não só strings
-- impedir enqueue duplicado do mesmo tipo enquanto ele já estiver ativo ou pendente
-- adicionar pequenos intervalos entre etapas para a pessoa “curtir” cada momento
+4. Conectar regressão ao saque
+- Hoje o saque só altera saldo e fecha o modal.
+- O `Dashboard` já observa mudanças de nível por saldo, então com a nova distinção ele poderá disparar automaticamente a animação de regressão após uma retirada que reduza o nível.
+- Manter a mesma cadência do app: sucesso do saque primeiro, depois regressão, sem sobreposição.
 
-### 2. Tirar o level-up do gatilho imediato do `balance`
-Em vez de abrir a animação assim que o saldo muda:
-- detectar que houve mudança de nível
-- guardar isso como “level-up pendente”
-- só disparar a animação depois que o fluxo do PIX terminar completamente
+5. Fazer o flashcard sair sem sensação de atraso
+- O clique já chama `onOpenChange(false)`, mas ainda há atraso percebido por dois motivos:
+  - o `Dialog` do Radix tem animação de fechamento
+  - o `Dashboard` aplica `COOLDOWN_MS` antes da próxima etapa
+- Ajustar `FlashcardPopup.tsx` para fechar com saída mais curta ou sem animação perceptível no clique do botão.
+- Ajustar `Dashboard.tsx` para permitir avanço imediato quando o overlay fechado for o flashcard, sem esperar o cooldown padrão.
+- Resultado esperado: tocou em “Entendi”, o card desaparece praticamente na hora.
 
-Isso resolve o principal conflito de timing.
+6. Arquivos a alterar
+- `src/pages/Dashboard.tsx`
+  - distinguir promoção e regressão
+  - enfileirar `leveldown`
+  - pular cooldown após fechamento do flashcard
+- `src/components/LevelUpAnimation.tsx`
+  - suportar variante de regressão com texto, visual e timing próprios
+- `src/hooks/useSound.ts`
+  - adicionar `playLevelDown`
+- `src/components/FlashcardPopup.tsx`
+  - reduzir/eliminar a sensação de atraso ao fechar
+- `src/components/WithdrawModal.tsx`
+  - provavelmente sem grande refatoração, apenas validar que a cadência continua correta
+- `public/sounds/porquinho_voltou_de_nível.mp3`
+  - novo áudio da regressão
 
-### 3. Fazer o `DepositModal` avisar o fim real da jornada do PIX
-Ajustar o `DepositModal` para separar melhor os eventos:
-- continuar mostrando a animação/som de sucesso do PIX
-- fechar o modal
-- só então notificar o `Dashboard` com um callback tipo “depósito concluído”
-- o `Dashboard` decide a próxima etapa: level-up primeiro, flashcard depois
-
-### 4. Prioridade clara entre eventos
-Definir esta ordem:
-```text
-1. Earnings de entrada
-2. PIX sucesso
-3. Level-up (se existir)
-4. Flashcard
-```
-
-Regras:
-- flashcard nunca abre durante `earnings`, `deposit` ou `levelup`
-- timer de flashcard fica bloqueado enquanto houver fluxo ativo
-- se o timer vencer durante outra animação, ele vira apenas “flashcard pendente”
-- mostrar apenas 1 flashcard por vez e sem duplicar enqueue
-
-### 5. Fixar o flashcard escolhido ao abrir
-No `FlashcardPopup`:
-- sortear o card apenas quando o popup abrir
-- manter esse card em estado local até fechar
-- evitar trocar de conteúdo em re-renders internos
-
-Isso elimina a sensação de dois cards aparecendo.
-
-## Cadência sugerida
-Vou usar uma cadência mais “jogo”:
-- fim do PIX → pausa de ~500–700ms
-- level-up → tela dedicada completa
-- fim do level-up → pausa de ~700–1000ms
-- abrir flashcard
-
-Se não houver level-up:
-- fim do PIX → pausa curta
-- flashcard
-
-## Arquivos a ajustar
-1. `src/pages/Dashboard.tsx`
-   - centralizar a orquestração do fluxo
-   - bloquear duplicidades
-   - adiar flashcard e level-up corretamente
-
-2. `src/components/DepositModal.tsx`
-   - separar “saldo atualizado” de “experiência PIX finalizada”
-   - disparar callback final apenas no momento certo
-
-3. `src/components/FlashcardPopup.tsx`
-   - persistir o flashcard sorteado durante a exibição
-
-## Resultado esperado
-Depois do ajuste, ao depositar:
-- a pessoa vê a confirmação do PIX inteira
-- depois vê a evolução do porquinho, se subiu de nível
-- só depois aparece um único flashcard
-- nunca mais tudo ao mesmo tempo
-
-## Detalhes técnicos
-- O ponto crítico é remover a dependência de timing implícito entre `balance`, `activeOverlay` e `onSuccess`.
-- A solução mais segura é tratar cada experiência como evento orquestrado pelo `Dashboard`, com fila, prioridade e cooldown curto entre overlays.
+Detalhes técnicos
+- Hoje a diferença entre subir e cair de nível não existe: o código compara apenas `prevLevelRef.current.label !== newLevel.label`.
+- A forma correta é comparar a posição do nível antigo e do novo em `PIG_LEVELS`.
+- O atraso do flashcard não está só no botão: o `DialogContent` também anima `data-[state=closed]`, e o `Dashboard` ainda espera `COOLDOWN_MS = 800` antes de seguir.
+- A correção mais segura é tratar o fechamento do flashcard como “close now”, separado do cooldown usado entre grandes experiências.
