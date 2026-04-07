@@ -7,6 +7,7 @@ import { PigSVG } from '@/components/EvolutionaryPig';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Mail, Zap, Wallet, QrCode, TrendingUp, GraduationCap, Shield, ArrowRightLeft } from 'lucide-react';
+import { toast } from 'sonner';
 
 const LoginParticles = () => (
   <>
@@ -49,15 +50,39 @@ const DEMO_BULLETS = [
 ];
 
 const Login = () => {
-  const { login, isLoading } = useAuth();
+  const { login, signup, isLoading } = useAuth();
   const { playAppOpen } = useSound();
   const navigate = useNavigate();
   const [mode, setMode] = useState<'demo' | 'experience'>('experience');
   const [showEmail, setShowEmail] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
 
   const handleLogin = async (method: 'google' | 'apple' | 'email') => {
-    await login(method, method === 'email' ? email : undefined);
+    if (method === 'email') {
+      let error: string | null;
+      if (isSignUp) {
+        error = await signup(email, password, name);
+        if (!error) {
+          toast.success('Conta criada! Verifique seu e-mail para confirmar.');
+          return;
+        }
+      } else {
+        error = await login(method, email, password);
+      }
+      if (error) {
+        toast.error(error);
+        return;
+      }
+    } else {
+      const error = await login(method);
+      if (error) {
+        toast.error(error);
+        return;
+      }
+    }
     playAppOpen();
     navigate('/dashboard');
   };
@@ -176,15 +201,6 @@ const Login = () => {
               Entrar com Google
             </Button>
 
-            <Button
-              className="w-full h-14 text-base font-black rounded-2xl bg-white/10 text-white hover:bg-white/15 gap-3 border border-white/10 active:scale-95 transition-transform backdrop-blur-sm"
-              onClick={() => handleLogin('apple')}
-              disabled={isLoading}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-              Entrar com Apple
-            </Button>
-
             {!showEmail ? (
               <Button
                 className="w-full h-14 text-base font-black rounded-2xl text-white/70 hover:text-white hover:bg-white/5 gap-3 border-0 bg-transparent active:scale-95 transition-transform"
@@ -195,6 +211,15 @@ const Login = () => {
               </Button>
             ) : (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-2">
+                {isSignUp && (
+                  <Input
+                    type="text"
+                    placeholder="Seu nome"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
+                  />
+                )}
                 <Input
                   type="email"
                   placeholder="seu@email.com"
@@ -202,13 +227,26 @@ const Login = () => {
                   onChange={e => setEmail(e.target.value)}
                   className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
                 />
+                <Input
+                  type="password"
+                  placeholder="Senha (mín. 6 caracteres)"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
+                />
                 <Button
                   className="w-full h-14 rounded-2xl gradient-hot text-white font-black glow-pink border-0 active:scale-95 transition-transform"
                   onClick={() => handleLogin('email')}
-                  disabled={!email || isLoading}
+                  disabled={!email || !password || password.length < 6 || isLoading}
                 >
-                  {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Entrar'}
+                  {isLoading ? <Loader2 className="animate-spin" size={20} /> : (isSignUp ? 'Criar Conta' : 'Entrar')}
                 </Button>
+                <button
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="w-full text-center text-white/50 text-sm font-semibold hover:text-white/70 transition-colors py-1"
+                >
+                  {isSignUp ? 'Já tenho conta → Entrar' : 'Não tem conta? Criar agora'}
+                </button>
               </motion.div>
             )}
           </motion.div>
@@ -222,7 +260,7 @@ const Login = () => {
         className="flex items-center gap-2 mt-8 text-white/50 text-xs relative z-10"
       >
         <Zap size={14} />
-        <p className="font-semibold"><p className="font-semibold">Powered by Stellar ⚡</p></p>
+        <p className="font-semibold">Powered by Stellar ⚡</p>
       </motion.div>
     </div>
   );
