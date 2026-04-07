@@ -18,7 +18,7 @@ const Education = () => {
             <h1 className="text-xl font-extrabold text-white">Educação DeFi</h1>
           </div>
           <p className="text-white/80 text-sm">
-            Aprenda sobre DeFi, Solana e como seu dinheiro rende 🎓
+            Aprenda sobre DeFi, Stellar e como seu dinheiro rende 🎓
           </p>
         </div>
       </div>

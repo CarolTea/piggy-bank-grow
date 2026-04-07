@@ -261,7 +261,7 @@ const Dashboard = () => {
                 +5.87% ao ano • +R${dailyYield.toFixed(4)}/dia
               </p>
             </motion.div>
-            <p className="text-white/70 text-[10px] mt-0.5 font-semibold">Rendendo via Solana ⚡</p>
+            <p className="text-white/70 text-[10px] mt-0.5 font-semibold"><p className="text-white/70 text-[10px] mt-0.5 font-semibold">Rendendo via Stellar ⚡</p></p>
           </motion.div>
         </div>
       </div>
@@ -308,7 +308,7 @@ const Dashboard = () => {
               { label: 'Rendimento hoje', value: `+R$ ${dailyYield.toFixed(4)}`, color: 'text-success' },
               { label: 'Rendimento/mês', value: `+R$ ${(dailyYield * 30).toFixed(2)}`, color: 'text-success' },
               { label: 'APY atual', value: '5.87%', color: 'text-primary' },
-              { label: 'Protocolo', value: 'Solana • Kamino Vaults', color: 'text-primary' },
+              { label: 'Protocolo', value: 'Stellar • Blend', color: 'text-primary' },
             ].map(item => (
               <div key={item.label} className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">{item.label}</span>
@@ -319,7 +319,7 @@ const Dashboard = () => {
           <div className="mt-3 pt-3 border-t border-border flex items-center gap-2">
             <Zap size={14} className="text-accent" />
             <p className="text-xs text-muted-foreground font-semibold">
-              Rede Solana — transações em &lt;1s, sem taxas
+              Rede Stellar — transações em &lt;1s, sem taxas
             </p>
           </div>
         </motion.div>

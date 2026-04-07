@@ -130,7 +130,7 @@ const WithdrawModal = ({ open, onOpenChange }: Props) => {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <Zap size={12} className="text-accent" /> Processado via Solana → PIX
+                <Zap size={12} className="text-accent" /> <Zap size={12} className="text-accent" /> Processado via Stellar → PIX
               </p>
               <Button
                 className="w-full h-13 text-lg font-black rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/90 active:scale-95 transition-transform"
@@ -146,7 +146,7 @@ const WithdrawModal = ({ open, onOpenChange }: Props) => {
               <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
                 <Loader2 className="text-secondary" size={48} />
               </motion.div>
-              <p className="font-black">Processando saque via Solana...</p>
+              <p className="font-black"><p className="font-black">Processando saque via Stellar...</p></p>
               <p className="text-xs text-muted-foreground">Convertendo e enviando para sua chave PIX</p>
             </motion.div>
           )}
@@ -162,7 +162,7 @@ const WithdrawModal = ({ open, onOpenChange }: Props) => {
                 <Check className="text-white" size={32} />
               </motion.div>
               <p className="font-black text-xl">Saque Processado! ⚡</p>
-              <p className="text-sm text-muted-foreground">R${amount} via Solana → PIX</p>
+              <p className="text-sm text-muted-foreground"><p className="text-sm text-muted-foreground">R${amount} via Stellar → PIX</p></p>
               <p className="text-xs text-muted-foreground">Chegará em 1-2 dias úteis</p>
             </motion.div>
           )}

@@ -1,4 +1,4 @@
-// Mock Web3 Services — simulates Privy, Jupiter, Kamino/Jito
+// Mock Web3 Services — simulates Privy, Jupiter, Blend
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -38,7 +38,7 @@ export const mockKaminoYield = async () => {
   await delay(400);
   return {
     apy: 5.87,
-    protocol: 'Jito Staking + Kamino Vaults',
+    protocol: 'Blend Protocol',
     dailyYield: 5.87 / 365,
     tvl: 1_200_000_000,
   };
@@ -53,7 +53,7 @@ export const mockDeposit = async (amountBRL: number) => {
     amountBRL,
     amountSOL: quote.outAmount,
     confirmationTime: '0.4s',
-    message: 'Depósito confirmado na rede Solana!',
+    message: 'Depósito confirmado na rede Stellar!',
   };
 };
 
@@ -64,7 +64,7 @@ export const mockWithdraw = async (amountBRL: number) => {
     txHash: 'tx_' + Math.random().toString(36).slice(2, 14),
     amountBRL,
     estimatedArrival: '1-2 dias úteis',
-    message: 'Saque processado com sucesso via Solana!',
+    message: 'Saque processado com sucesso via Stellar!',
   };
 };
 
@@ -110,21 +110,21 @@ export const mockFlashcards: Flashcard[] = [
   {
     id: 3,
     title: 'Staking — Rendimento Passivo',
-    content: 'Staking é como deixar seu dinheiro "trabalhando" para validar transações na blockchain. Em troca, você recebe recompensas diárias. No Smart Pig, seu saldo rende automaticamente via Jito Staking na Solana.',
+    content: 'Staking é como deixar seu dinheiro "trabalhando" para validar transações na blockchain. Em troca, você recebe recompensas diárias. No Smart Pig, seu saldo rende automaticamente via Blend na Stellar.',
     emoji: '⛏️',
     color: 'from-amber-600 to-orange-500',
   },
   {
     id: 4,
-    title: 'O que é a Solana?',
-    content: 'Solana é uma rede blockchain ultra-rápida que processa milhares de transações por segundo, com taxas quase zero. É a "rodovia expressa" das criptomoedas — seu dinheiro viaja por ela de forma invisível e instantânea.',
+    title: 'O que é a Stellar?',
+    content: 'Stellar é uma rede blockchain ultra-rápida que processa milhares de transações por segundo, com taxas quase zero. É a "rodovia expressa" das criptomoedas — seu dinheiro viaja por ela de forma invisível e instantânea.',
     emoji: '⚡',
     color: 'from-purple-600 to-indigo-500',
   },
   {
     id: 5,
-    title: 'Kamino Vaults — Cofres Inteligentes',
-    content: 'Seus reais são convertidos automaticamente e depositados nos Kamino Vaults na Solana. Esses cofres usam estratégias DeFi avançadas para maximizar seu rendimento 24h por dia, sem você precisar fazer nada.',
+    title: 'Blend Protocol — Cofres Inteligentes',
+    content: 'Seus reais são convertidos automaticamente e depositados no Blend Protocol na Stellar. Esse protocolo usa estratégias DeFi avançadas para maximizar seu rendimento 24h por dia, sem você precisar fazer nada.',
     emoji: '🏛️',
     color: 'from-cyan-600 to-blue-500',
   },
@@ -144,8 +144,8 @@ export const mockFlashcards: Flashcard[] = [
   },
   {
     id: 8,
-    title: 'Solana vs Banco Tradicional',
-    content: 'Bancos demoram 1-3 dias para transferências e cobram taxas. Na Solana, transações acontecem em menos de 1 segundo e custam centavos. Seu dinheiro rende 24/7, não só em dias úteis.',
+    title: 'Stellar vs Banco Tradicional',
+    content: 'Bancos demoram 1-3 dias para transferências e cobram taxas. Na Stellar, transações acontecem em menos de 1 segundo e custam centavos. Seu dinheiro rende 24/7, não só em dias úteis.',
     emoji: '🏎️',
     color: 'from-red-600 to-orange-500',
   },

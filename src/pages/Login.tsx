@@ -41,9 +41,9 @@ const LoginParticles = () => (
 
 const DEMO_BULLETS = [
   { icon: Shield, title: 'Auth invisível via Privy', desc: 'Login social cria sua carteira automaticamente. Sem seed phrase, sem extensão, sem complicação' },
-  { icon: QrCode, title: 'PIX → USDC via Banxa', desc: 'Conversão PIX → USDC na Solana. Deposite R$10, R$50 ou R$500' },
-  { icon: ArrowRightLeft, title: 'Melhor rota via Jupiter Swap API', desc: 'Swap automático USDC → JitoSOL pela melhor rota e menor taxa do mercado' },
-  { icon: TrendingUp, title: 'JitoSOL: ~7.5–8.5% ao ano', desc: 'Liquid Staking nativo da Solana. Rendimento de validação sem Impermanent Loss' },
+  { icon: QrCode, title: 'PIX → USDC via Banxa', desc: 'Conversão PIX → USDC na Stellar. Deposite R$10, R$50 ou R$500' },
+  { icon: ArrowRightLeft, title: 'Melhor rota via Jupiter Swap API', desc: 'Swap automático USDC → Blend pela melhor rota e menor taxa do mercado' },
+  { icon: TrendingUp, title: 'Blend: ~7.5–8.5% ao ano', desc: 'Lending nativo da Stellar. Rendimento sem Impermanent Loss' },
   { icon: GraduationCap, title: 'Gamificação que educa', desc: 'Porquinho evolui conforme você poupa, com flashcards de educação financeira' },
   { icon: Wallet, title: 'Só cobramos quando você ganha', desc: 'Performance fee de 15% sobre o yield. Sem mensalidade, sem barreira de entrada' },
 ];
@@ -52,7 +52,7 @@ const Login = () => {
   const { login, isLoading } = useAuth();
   const { playAppOpen } = useSound();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<'demo' | 'experience'>('demo');
+  const [mode, setMode] = useState<'demo' | 'experience'>('experience');
   const [showEmail, setShowEmail] = useState(false);
   const [email, setEmail] = useState('');
 
@@ -222,7 +222,7 @@ const Login = () => {
         className="flex items-center gap-2 mt-8 text-white/50 text-xs relative z-10"
       >
         <Zap size={14} />
-        <p className="font-semibold">Powered by Solana ⚡</p>
+        <p className="font-semibold"><p className="font-semibold">Powered by Stellar ⚡</p></p>
       </motion.div>
     </div>
   );
