@@ -54,7 +54,7 @@ const Login = () => {
   const { playAppOpen } = useSound();
   const navigate = useNavigate();
   const [mode, setMode] = useState<'demo' | 'experience'>('experience');
-  const [showEmail, setShowEmail] = useState(false);
+  const [showEmail, setShowEmail] = useState(true);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
