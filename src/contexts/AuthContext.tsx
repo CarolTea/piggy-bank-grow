@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { User } from '@supabase/supabase-js';
+import type { Session, User } from '@supabase/supabase-js';
 
 interface AuthUser {
   id: string;
@@ -14,6 +14,7 @@ interface AuthUser {
 interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
+  isReady: boolean;
   login: (email: string, password: string) => Promise<string | null>;
   signup: (email: string, password: string, name?: string) => Promise<string | null>;
   logout: () => Promise<void>;
@@ -32,46 +33,65 @@ const mapUser = (user: User, profile?: { name?: string; avatar_url?: string; pix
 });
 
 const fetchProfile = async (userId: string) => {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('profiles')
     .select('name, avatar_url, pix_key')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
+
+  if (error) {
+    return null;
+  }
+
   return data;
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id);
-        setUser(mapUser(session.user, profile));
-      } else {
+    let isMounted = true;
+
+    const syncSession = async (session: Session | null) => {
+      if (!isMounted) return;
+
+      if (!session?.user) {
         setUser(null);
+        setIsReady(true);
+        return;
       }
-      setIsLoading(false);
+
+      const profile = await fetchProfile(session.user.id);
+
+      if (!isMounted) return;
+
+      setUser(mapUser(session.user, profile));
+      setIsReady(true);
+    };
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      void syncSession(session);
     });
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id);
-        setUser(mapUser(session.user, profile));
-      }
-      setIsLoading(false);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      void syncSession(session);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<string | null> => {
     setIsLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return error.message;
-      return null;
+      return error?.message ?? null;
     } finally {
       setIsLoading(false);
     }
@@ -88,8 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           data: { full_name: name || email.split('@')[0] },
         },
       });
-      if (error) return error.message;
-      return null;
+      return error?.message ?? null;
     } finally {
       setIsLoading(false);
     }
@@ -101,14 +120,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const setPixKey = useCallback((key: string) => {
-    setUser(prev => prev ? { ...prev, pixKey: key } : prev);
+    setUser(prev => (prev ? { ...prev, pixKey: key } : prev));
     if (user) {
       supabase.from('profiles').update({ pix_key: key }).eq('id', user.id).then();
     }
   }, [user]);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, setPixKey }}>
+    <AuthContext.Provider value={{ user, isLoading, isReady, login, signup, logout, setPixKey }}>
       {children}
     </AuthContext.Provider>
   );
