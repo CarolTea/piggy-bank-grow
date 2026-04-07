@@ -210,7 +210,7 @@ const DepositModal = ({ open, onOpenChange, onSuccess }: Props) => {
                     <Loader2 size={14} className="animate-spin" />
                     <p className="text-xs font-black">Aguardando pagamento... ({pixTimer}s)</p>
                   </motion.div>
-                  <p className="text-[10px] text-muted-foreground mt-1">R$ {amount} via Solana</p>
+                  <p className="text-[10px] text-muted-foreground mt-1"><p className="text-[10px] text-muted-foreground mt-1">R$ {amount} via Stellar</p></p>
                 </div>
               </motion.div>
             )}
@@ -220,7 +220,7 @@ const DepositModal = ({ open, onOpenChange, onSuccess }: Props) => {
                 <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
                   <Loader2 className="text-primary" size={48} />
                 </motion.div>
-                <p className="font-black text-lg">Confirmando na Solana...</p>
+                <p className="font-black text-lg"><p className="font-black text-lg">Confirmando na Stellar...</p></p>
                 <p className="text-sm text-muted-foreground">Transação em menos de 1s ⚡</p>
               </motion.div>
             )}
@@ -235,7 +235,7 @@ const DepositModal = ({ open, onOpenChange, onSuccess }: Props) => {
                 >
                   <Check className="text-white" size={32} />
                 </motion.div>
-                <p className="font-black text-xl">Confirmado na Solana ⚡</p>
+                <p className="font-black text-xl"><p className="font-black text-xl">Confirmado na Stellar ⚡</p></p>
                 <p className="text-sm text-muted-foreground">R${amount} adicionados ao seu porquinho</p>
                 <motion.div
                   animate={{ y: [0, -20, 0], scale: [1, 1.3, 1], rotate: [0, 10, -10, 0] }}

@@ -1,4 +1,4 @@
-// Mock Web3 Services — simulates Privy, Jupiter, Kamino/Jito
+// Mock Web3 Services — simulates Privy, Jupiter, Blend
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -38,7 +38,7 @@ export const mockKaminoYield = async () => {
   await delay(400);
   return {
     apy: 5.87,
-    protocol: 'Jito Staking + Kamino Vaults',
+    protocol: 'Blend Protocol',
     dailyYield: 5.87 / 365,
     tvl: 1_200_000_000,
   };
@@ -53,7 +53,7 @@ export const mockDeposit = async (amountBRL: number) => {
     amountBRL,
     amountSOL: quote.outAmount,
     confirmationTime: '0.4s',
-    message: 'Depósito confirmado na rede Solana!',
+    message: 'Depósito confirmado na rede Stellar!',
   };
 };
 
@@ -64,7 +64,7 @@ export const mockWithdraw = async (amountBRL: number) => {
     txHash: 'tx_' + Math.random().toString(36).slice(2, 14),
     amountBRL,
     estimatedArrival: '1-2 dias úteis',
-    message: 'Saque processado com sucesso via Solana!',
+    message: 'Saque processado com sucesso via Stellar!',
   };
 };
 
