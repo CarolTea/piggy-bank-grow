@@ -1,40 +1,51 @@
 
 
-# Remover modo Demo padrão, iniciar no login, e trocar Solana → Stellar
+# Implementar autenticação real com e-mail e Google
 
 ## Resumo
 
-1. Remover o modo Demo como tela inicial — o app começa direto na tela de login (modo "experience"). O toggle Demo/Experiência permanece para quem quiser ver os bullets.
-2. Trocar todas as referências a **Solana** por **Stellar** em todo o projeto.
-3. Trocar **Protocolo: Solana • Kamino Vaults** por **Stellar • Blend** no Dashboard.
-4. Atualizar flashcards e mock services que mencionam Solana/Jito/Kamino.
+Substituir o mock de autenticação por autenticação real usando Lovable Cloud (Supabase). O usuário poderá criar conta com e-mail/senha ou conectar com Google, com os dados salvos no banco de dados.
 
-## Alterações por arquivo
+## Etapas
 
-### `src/pages/Login.tsx`
-- Mudar `useState<'demo' | 'experience'>('demo')` → `('experience')` para iniciar no login
-- Nos `DEMO_BULLETS`: trocar "na Solana" → "na Stellar", "JitoSOL" → "Blend", "Liquid Staking nativo da Solana" → "Lending nativo da Stellar"
-- "Powered by Solana ⚡" → "Powered by Stellar ⚡"
+### 1. Habilitar Lovable Cloud
+- Ativar o backend Supabase integrado via ferramenta `cloud-enable`
+- Isso provisiona banco de dados, autenticação e API automaticamente
 
-### `src/pages/Dashboard.tsx`
-- "Rendendo via Solana ⚡" → "Rendendo via Stellar ⚡"
-- "Protocolo: Solana • Kamino Vaults" → "Stellar • Blend"
-- "Rede Solana — transações em <1s" → "Rede Stellar — transações em <1s"
+### 2. Criar tabela `profiles`
+- Tabela `profiles` com `id` (FK para `auth.users`), `name`, `avatar_url`, `created_at`
+- RLS: usuários só leem/editam o próprio perfil
+- Trigger para criar perfil automaticamente no signup
 
-### `src/components/DepositModal.tsx`
-- Todas as menções "Solana" → "Stellar" (PIX key, confirmação, processamento)
+### 3. Configurar Google OAuth
+- Habilitar provider Google no Lovable Cloud
 
-### `src/components/WithdrawModal.tsx`
-- "Processado via Solana → PIX" → "Processado via Stellar → PIX"
-- "Processando saque via Solana..." → "Processando saque via Stellar..."
-- "via Solana → PIX" → "via Stellar → PIX"
+### 4. Criar cliente Supabase no frontend
+- Arquivo `src/integrations/supabase/client.ts` com `createClient`
+- Variáveis de ambiente `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`
 
-### `src/services/mockWeb3Services.ts`
-- Comentário "Kamino/Jito" → "Blend"
-- `mockKaminoYield`: protocol → "Blend Protocol"
-- Mensagens de depósito/saque: "Solana" → "Stellar"
-- Flashcards: trocar Solana por Stellar, Jito por Blend, Kamino Vaults por Blend Protocol
+### 5. Reescrever `AuthContext.tsx`
+- Substituir `mockPrivyAuth` por chamadas reais ao Supabase Auth
+- `login('email')` → `supabase.auth.signUp()` ou `signInWithPassword()`
+- `login('google')` → `supabase.auth.signInWithOAuth({ provider: 'google' })`
+- `logout` → `supabase.auth.signOut()`
+- Listener `onAuthStateChange` para manter sessão
+- Buscar perfil da tabela `profiles` após login
 
-### `src/pages/Education.tsx`
-- "DeFi, Solana" → "DeFi, Stellar"
+### 6. Atualizar `Login.tsx`
+- Adicionar campo de senha para login com e-mail
+- Adicionar toggle "Criar conta" vs "Já tenho conta"
+- Manter o visual atual (cores, animações, pig)
+- Botão Google chama OAuth real
+
+### 7. Remover mock de auth
+- Remover `mockPrivyAuth` de `mockWeb3Services.ts`
+- Manter os outros mocks (deposit, withdraw, yield) intactos
+
+## Detalhes técnicos
+
+- Arquivo novo: `src/integrations/supabase/client.ts`
+- Arquivos alterados: `src/contexts/AuthContext.tsx`, `src/pages/Login.tsx`, `src/services/mockWeb3Services.ts`
+- Migration: criar tabela `profiles` + trigger + RLS policies
+- O tipo `AuthUser` passa a refletir o perfil do Supabase em vez do mock
 
