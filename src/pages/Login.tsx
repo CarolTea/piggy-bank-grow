@@ -60,28 +60,20 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  const handleLogin = async (method: 'google' | 'apple' | 'email') => {
-    if (method === 'email') {
-      let error: string | null;
-      if (isSignUp) {
-        error = await signup(email, password, name);
-        if (!error) {
-          toast.success('Conta criada! Verifique seu e-mail para confirmar.');
-          return;
-        }
-      } else {
-        error = await login(method, email, password);
-      }
-      if (error) {
-        toast.error(error);
+  const handleEmailSubmit = async () => {
+    let error: string | null;
+    if (isSignUp) {
+      error = await signup(email, password, name);
+      if (!error) {
+        toast.success('Conta criada! Verifique seu e-mail para confirmar.');
         return;
       }
     } else {
-      const error = await login(method);
-      if (error) {
-        toast.error(error);
-        return;
-      }
+      error = await login(email, password);
+    }
+    if (error) {
+      toast.error(error);
+      return;
     }
     playAppOpen();
     navigate('/dashboard');
