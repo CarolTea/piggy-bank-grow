@@ -16,12 +16,19 @@ const queryClient = new QueryClient();
 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
+  const { user, isReady } = useAuth();
+
+  if (!isReady) return null;
+
   return user ? <>{children}</> : <Navigate to="/" replace />;
 };
 
 const AppRoutes = () => {
-  const { user } = useAuth();
+  const { user, isReady } = useAuth();
+
+  if (!isReady) {
+    return <div className="min-h-screen bg-background" />;
+  }
 
   return (
     <Routes>

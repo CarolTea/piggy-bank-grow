@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSound } from '@/hooks/useSound';
 import { PigSVG } from '@/components/EvolutionaryPig';
@@ -52,7 +51,6 @@ const DEMO_BULLETS = [
 const Login = () => {
   const { login, signup, isLoading } = useAuth();
   const { playAppOpen } = useSound();
-  const navigate = useNavigate();
   const [mode, setMode] = useState<'demo' | 'experience'>('experience');
   const [showEmail, setShowEmail] = useState(true);
   const [isSignUp, setIsSignUp] = useState(false);
@@ -61,22 +59,20 @@ const Login = () => {
   const [name, setName] = useState('');
 
   const handleEmailSubmit = async () => {
-    let error: string | null;
-    if (isSignUp) {
-      error = await signup(email, password, name);
-      if (!error) {
-        toast.success('Conta criada! Verifique seu e-mail para confirmar.');
-        return;
-      }
-    } else {
-      error = await login(email, password);
-    }
+    const error = isSignUp
+      ? await signup(email, password, name)
+      : await login(email, password);
+
     if (error) {
       toast.error(error);
       return;
     }
+
     playAppOpen();
-    navigate('/dashboard');
+
+    if (isSignUp) {
+      toast.success('Conta criada com sucesso!');
+    }
   };
 
   return (
