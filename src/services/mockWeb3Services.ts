@@ -2,23 +2,6 @@
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  walletAddress: string;
-}
-
-export const mockPrivyAuth = async (method: 'google' | 'apple' | 'email', email?: string): Promise<User> => {
-  await delay(1200);
-  return {
-    id: 'usr_' + Math.random().toString(36).slice(2, 10),
-    name: method === 'email' ? (email?.split('@')[0] || 'Usuário') : 'Usuário Smart Pig',
-    email: email || `user@${method}.com`,
-    walletAddress: '0x' + Math.random().toString(36).slice(2, 14) + '...',
-  };
-};
-
 export const mockJupiterQuote = async (amountBRL: number) => {
   await delay(600);
   const solPrice = 680.50;
