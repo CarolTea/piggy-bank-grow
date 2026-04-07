@@ -1,24 +1,40 @@
 
 
-# Atualizar bullets Demo com stack técnico real do pitch
+# Remover modo Demo padrão, iniciar no login, e trocar Solana → Stellar
 
-## O que muda
+## Resumo
 
-Reescrever o array `DEMO_BULLETS` em `src/pages/Login.tsx` (linhas 42-49) para refletir fielmente o stack descrito no pitch, com as tecnologias corretas e APY atualizado.
+1. Remover o modo Demo como tela inicial — o app começa direto na tela de login (modo "experience"). O toggle Demo/Experiência permanece para quem quiser ver os bullets.
+2. Trocar todas as referências a **Solana** por **Stellar** em todo o projeto.
+3. Trocar **Protocolo: Solana • Kamino Vaults** por **Stellar • Blend** no Dashboard.
+4. Atualizar flashcards e mock services que mencionam Solana/Jito/Kamino.
 
-## Novos bullets
+## Alterações por arquivo
 
-1. **Auth invisível via Privy** (icon: `Shield`) — "Login social cria sua carteira automaticamente. Sem seed phrase, sem extensão, sem complicação"
-2. **PIX → USDC via Bipa API** (icon: `QrCode`) — "Conversão PIX → USDC na Solana em D+2. Deposite R$10, R$50 ou R$500"
-3. **Melhor rota via Jupiter V6** (icon: `ArrowRightLeft`) — "Swap automático USDC → JitoSOL pela melhor rota e menor taxa do mercado"
-4. **JitoSOL: ~7.5–8.5% ao ano** (icon: `TrendingUp`) — "Liquid Staking nativo da Solana. Rendimento de validação sem Impermanent Loss"
-5. **Gamificação que educa** (icon: `GraduationCap`) — "Porquinho evolui conforme você poupa, com flashcards de educação financeira"
-6. **Só cobramos quando você ganha** (icon: `Wallet`) — "Performance fee de 15% sobre o yield. Sem mensalidade, sem barreira de entrada"
+### `src/pages/Login.tsx`
+- Mudar `useState<'demo' | 'experience'>('demo')` → `('experience')` para iniciar no login
+- Nos `DEMO_BULLETS`: trocar "na Solana" → "na Stellar", "JitoSOL" → "Blend", "Liquid Staking nativo da Solana" → "Lending nativo da Stellar"
+- "Powered by Solana ⚡" → "Powered by Stellar ⚡"
 
-## Detalhes técnicos
+### `src/pages/Dashboard.tsx`
+- "Rendendo via Solana ⚡" → "Rendendo via Stellar ⚡"
+- "Protocolo: Solana • Kamino Vaults" → "Stellar • Blend"
+- "Rede Solana — transações em <1s" → "Rede Stellar — transações em <1s"
 
-- Arquivo: `src/pages/Login.tsx`
-- Adicionar import `ArrowRightLeft` do Lucide (substituir `EyeOff`)
-- Atualizar o array `DEMO_BULLETS` com os 6 novos itens
-- Remover imports não utilizados (`EyeOff`)
+### `src/components/DepositModal.tsx`
+- Todas as menções "Solana" → "Stellar" (PIX key, confirmação, processamento)
+
+### `src/components/WithdrawModal.tsx`
+- "Processado via Solana → PIX" → "Processado via Stellar → PIX"
+- "Processando saque via Solana..." → "Processando saque via Stellar..."
+- "via Solana → PIX" → "via Stellar → PIX"
+
+### `src/services/mockWeb3Services.ts`
+- Comentário "Kamino/Jito" → "Blend"
+- `mockKaminoYield`: protocol → "Blend Protocol"
+- Mensagens de depósito/saque: "Solana" → "Stellar"
+- Flashcards: trocar Solana por Stellar, Jito por Blend, Kamino Vaults por Blend Protocol
+
+### `src/pages/Education.tsx`
+- "DeFi, Solana" → "DeFi, Stellar"
 
