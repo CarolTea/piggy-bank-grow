@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable';
-import type { User, Session } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 
 interface AuthUser {
   id: string;
@@ -15,7 +14,7 @@ interface AuthUser {
 interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
-  login: (method: 'google' | 'apple' | 'email', email?: string, password?: string) => Promise<string | null>;
+  login: (email: string, password: string) => Promise<string | null>;
   signup: (email: string, password: string, name?: string) => Promise<string | null>;
   logout: () => Promise<void>;
   setPixKey: (key: string) => void;
@@ -67,24 +66,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const login = useCallback(async (method: 'google' | 'apple' | 'email', email?: string, password?: string): Promise<string | null> => {
+  const login = useCallback(async (email: string, password: string): Promise<string | null> => {
     setIsLoading(true);
     try {
-      if (method === 'google') {
-        const result = await lovable.auth.signInWithOAuth('google', {
-          redirect_uri: window.location.origin,
-        });
-        if (result.error) return result.error.message;
-        return null;
-      }
-
-      if (method === 'email' && email && password) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) return error.message;
-        return null;
-      }
-
-      return 'Método de login inválido';
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return error.message;
+      return null;
     } finally {
       setIsLoading(false);
     }
