@@ -123,10 +123,24 @@ export const useSound = () => {
 
   const startBgMusic = useCallback(() => {
     if (globalMuted) return;
+    resumeCtx();
     const bg = getBgMusic();
-    if (bg.paused) {
-      bg.play().catch(() => {});
-    }
+    if (!bg.paused) return;
+    const tryPlay = () => bg.play();
+    tryPlay().catch(err => {
+      console.warn('bg music blocked, will retry on next user gesture:', err?.name || err);
+      const retry = () => {
+        document.removeEventListener('pointerdown', retry);
+        document.removeEventListener('touchstart', retry);
+        document.removeEventListener('keydown', retry);
+        if (globalMuted) return;
+        resumeCtx();
+        tryPlay().catch(e => console.warn('bg music retry failed:', e?.name || e));
+      };
+      document.addEventListener('pointerdown', retry, { once: true });
+      document.addEventListener('touchstart', retry, { once: true });
+      document.addEventListener('keydown', retry, { once: true });
+    });
   }, []);
 
   const stopBgMusic = useCallback(() => {

@@ -1,29 +1,31 @@
+## Problema
+A música ambiente usa `audio.play()` dentro de um `useEffect` no Dashboard. Navegadores bloqueiam autoplay sem gesto direto do usuário, então:
+- Funciona quando o usuário clica "Entrar" e é redirecionado.
+- **Falha** em refresh direto no `/dashboard`, deep links, ou em iOS Safari onde o gesto não "atravessa" o `await`/navegação.
 
+O erro é silenciado por `.catch(() => {})`, então parece aleatório.
 
-# Corrigir autenticação: publicar o app e testar na URL pública
+## Correção proposta
 
-## Diagnóstico
+**1. Garantir que a música arme no clique de Login (gesto direto)**
+No `handleLogin` do `src/pages/Login.tsx`, chamar `startBgMusic()` **sincronamente dentro do onClick**, antes do `await` de autenticação. Assim o navegador registra o gesto.
 
-Os dois problemas relatados são **limitações conhecidas do ambiente de preview**, não bugs no código:
+**2. Fallback "tap-to-start" quando autoplay é bloqueado**
+No `useSound`, fazer `startBgMusic()` retornar a Promise do `play()` e detectar rejeição. Se rejeitar:
+- Marcar estado global `bgBlocked = true`.
+- Registrar um listener `once` em `document` para `pointerdown`/`touchstart` que tenta `play()` de novo automaticamente no próximo toque do usuário.
 
-1. **Google OAuth 404**: O proxy do preview interfere com as requisições de autenticação do OAuth, causando erro 404.
-2. **Link de confirmação de e-mail vai para login do Lovable**: A URL de preview requer autenticação do Lovable, então o link de confirmação redireciona para o login do Lovable em vez de confirmar a conta.
+**3. Resumir AudioContext junto**
+Chamar `audioCtx.resume()` no mesmo gesto, pois ele também pode estar suspenso após reload.
 
-## Solução
+**4. Logar falhas em vez de engolir**
+Trocar `.catch(() => {})` por `.catch(err => console.warn('bg music blocked:', err.name))` para diagnosticar futuros casos.
 
-**Publicar o app** e testar na URL pública (`.lovable.app`). Ambos os fluxos (Google e confirmação de e-mail) funcionam corretamente na URL publicada.
+## Arquivos afetados
+- `src/hooks/useSound.ts` — endurecer `startBgMusic` com fallback de gesto e log.
+- `src/pages/Login.tsx` — disparar `startBgMusic()` no onClick do botão Entrar (sincronamente).
+- `src/pages/Dashboard.tsx` — manter o `useEffect` como tentativa otimista (sem mudanças funcionais).
 
-### Passo a passo
-
-1. Clicar no botão **Publish** (canto superior direito do editor)
-2. Publicar o projeto para gerar a URL pública
-3. Testar o login com Google na URL publicada
-4. Testar o cadastro por e-mail e a confirmação na URL publicada
-
-### Nenhuma alteração de código é necessária
-
-O código de autenticação está implementado corretamente:
-- Google OAuth usa `lovable.auth.signInWithOAuth` (padrão correto)
-- Signup com e-mail usa `supabase.auth.signUp` com `emailRedirectTo: window.location.origin`
-- O listener `onAuthStateChange` gerencia a sessão corretamente
-
+## Resultado esperado
+- Login normal: música começa imediatamente (gesto do botão).
+- Refresh em `/dashboard`: tentativa otimista; se bloqueada, começa no primeiro toque/clique do usuário na tela — sem que ele perceba.

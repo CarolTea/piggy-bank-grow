@@ -50,7 +50,7 @@ const DEMO_BULLETS = [
 
 const Login = () => {
   const { login, signup, isLoading } = useAuth();
-  const { playAppOpen } = useSound();
+  const { playAppOpen, startBgMusic } = useSound();
   const [mode, setMode] = useState<'demo' | 'experience'>('experience');
   const [showEmail, setShowEmail] = useState(true);
   const [isSignUp, setIsSignUp] = useState(false);
@@ -213,7 +213,7 @@ const Login = () => {
                 />
                 <Button
                   className="w-full h-14 rounded-2xl gradient-hot text-white font-black glow-pink border-0 active:scale-95 transition-transform"
-                  onClick={() => handleEmailSubmit()}
+                  onClick={() => { startBgMusic(); handleEmailSubmit(); }}
                   disabled={!email || !password || password.length < 6 || isLoading}
                 >
                   {isLoading ? <Loader2 className="animate-spin" size={20} /> : (isSignUp ? 'Criar Conta' : 'Entrar')}
