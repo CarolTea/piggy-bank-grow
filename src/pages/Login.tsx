@@ -50,7 +50,7 @@ const DEMO_BULLETS = [
 
 const Login = () => {
   const { login, signup, isLoading } = useAuth();
-  const { playAppOpen } = useSound();
+  const { playAppOpen, startBgMusic } = useSound();
   const [mode, setMode] = useState<'demo' | 'experience'>('experience');
   const [showEmail, setShowEmail] = useState(true);
   const [isSignUp, setIsSignUp] = useState(false);
