@@ -50,12 +50,13 @@ const DEMO_BULLETS = [
 
 const Login = () => {
   const { login, signup, isLoading } = useAuth();
-  const { playAppOpen, startBgMusic } = useSound();
+  const { playAppOpen } = useSound();
   const [mode, setMode] = useState<'demo' | 'experience'>('experience');
   const [showEmail, setShowEmail] = useState(true);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
 
   const handleEmailSubmit = async () => {
