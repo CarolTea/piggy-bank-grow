@@ -205,16 +205,26 @@ const Login = () => {
                   onChange={e => setEmail(e.target.value)}
                   className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
                 />
-                <Input
-                  type="password"
-                  placeholder="Senha (mín. 6 caracteres)"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Senha (mín. 6 caracteres)"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(s => !s)}
+                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
                 <Button
                   className="w-full h-14 rounded-2xl gradient-hot text-white font-black glow-pink border-0 active:scale-95 transition-transform"
-                  onClick={() => { startBgMusic(); handleEmailSubmit(); }}
+                  onClick={handleEmailSubmit}
                   disabled={!email || !password || password.length < 6 || isLoading}
                 >
                   {isLoading ? <Loader2 className="animate-spin" size={20} /> : (isSignUp ? 'Criar Conta' : 'Entrar')}
