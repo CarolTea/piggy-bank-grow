@@ -6,28 +6,10 @@ const audioCtx = typeof window !== 'undefined' ? new (window.AudioContext || (wi
 let globalMuted = typeof window !== 'undefined' ? localStorage.getItem('smartpig_muted') === 'true' : false;
 const muteListeners = new Set<(muted: boolean) => void>();
 
-// Background music singleton
-let bgMusic: HTMLAudioElement | null = null;
-function getBgMusic(): HTMLAudioElement {
-  if (!bgMusic) {
-    bgMusic = new Audio('/sounds/musica_ambiente.mp3');
-    bgMusic.loop = true;
-    bgMusic.volume = 0.08; // very low so it doesn't compete
-  }
-  return bgMusic;
-}
-
 function setGlobalMuted(muted: boolean) {
   globalMuted = muted;
   if (typeof window !== 'undefined') localStorage.setItem('smartpig_muted', String(muted));
   muteListeners.forEach(fn => fn(muted));
-  // Sync bg music
-  const bg = getBgMusic();
-  if (muted) {
-    bg.pause();
-  } else if (!bg.paused === false) {
-    // will be resumed by startBgMusic if it was playing
-  }
 }
 
 function resumeCtx() {
@@ -121,42 +103,5 @@ export const useSound = () => {
     playFile('/sounds/abriu_o_app.wav');
   }, []);
 
-  const startBgMusic = useCallback(() => {
-    if (globalMuted) return;
-    resumeCtx();
-    const bg = getBgMusic();
-    if (!bg.paused) return;
-    const tryPlay = () => bg.play();
-    tryPlay().catch(err => {
-      console.warn('bg music blocked, will retry on next user gesture:', err?.name || err);
-      const retry = () => {
-        document.removeEventListener('pointerdown', retry);
-        document.removeEventListener('touchstart', retry);
-        document.removeEventListener('keydown', retry);
-        if (globalMuted) return;
-        resumeCtx();
-        tryPlay().catch(e => console.warn('bg music retry failed:', e?.name || e));
-      };
-      document.addEventListener('pointerdown', retry, { once: true });
-      document.addEventListener('touchstart', retry, { once: true });
-      document.addEventListener('keydown', retry, { once: true });
-    });
-  }, []);
-
-  const stopBgMusic = useCallback(() => {
-    const bg = getBgMusic();
-    bg.pause();
-    bg.currentTime = 0;
-  }, []);
-
-  const setBgVolume = useCallback((vol: number) => {
-    const bg = getBgMusic();
-    bg.volume = Math.max(0, Math.min(1, vol));
-  }, []);
-
-  const getBgVolume = useCallback(() => {
-    return getBgMusic().volume;
-  }, []);
-
-  return { playCoin, playLevelUp, playLevelDown, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, startBgMusic, stopBgMusic, setBgVolume, getBgVolume, muted, toggleMute };
+  return { playCoin, playLevelUp, playLevelDown, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, muted, toggleMute };
 };

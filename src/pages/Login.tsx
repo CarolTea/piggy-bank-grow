@@ -5,7 +5,7 @@ import { useSound } from '@/hooks/useSound';
 import { PigSVG } from '@/components/EvolutionaryPig';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Mail, Zap, Wallet, QrCode, TrendingUp, GraduationCap, Shield, ArrowRightLeft } from 'lucide-react';
+import { Loader2, Mail, Zap, Wallet, QrCode, TrendingUp, GraduationCap, Shield, ArrowRightLeft, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 const LoginParticles = () => (
@@ -50,12 +50,13 @@ const DEMO_BULLETS = [
 
 const Login = () => {
   const { login, signup, isLoading } = useAuth();
-  const { playAppOpen, startBgMusic } = useSound();
+  const { playAppOpen } = useSound();
   const [mode, setMode] = useState<'demo' | 'experience'>('experience');
   const [showEmail, setShowEmail] = useState(true);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
 
   const handleEmailSubmit = async () => {
@@ -204,16 +205,26 @@ const Login = () => {
                   onChange={e => setEmail(e.target.value)}
                   className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
                 />
-                <Input
-                  type="password"
-                  placeholder="Senha (mín. 6 caracteres)"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Senha (mín. 6 caracteres)"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(s => !s)}
+                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
                 <Button
                   className="w-full h-14 rounded-2xl gradient-hot text-white font-black glow-pink border-0 active:scale-95 transition-transform"
-                  onClick={() => { startBgMusic(); handleEmailSubmit(); }}
+                  onClick={handleEmailSubmit}
                   disabled={!email || !password || password.length < 6 || isLoading}
                 >
                   {isLoading ? <Loader2 className="animate-spin" size={20} /> : (isSignUp ? 'Criar Conta' : 'Entrar')}
