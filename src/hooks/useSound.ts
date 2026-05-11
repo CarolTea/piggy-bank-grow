@@ -103,42 +103,5 @@ export const useSound = () => {
     playFile('/sounds/abriu_o_app.wav');
   }, []);
 
-  const startBgMusic = useCallback(() => {
-    if (globalMuted) return;
-    resumeCtx();
-    const bg = getBgMusic();
-    if (!bg.paused) return;
-    const tryPlay = () => bg.play();
-    tryPlay().catch(err => {
-      console.warn('bg music blocked, will retry on next user gesture:', err?.name || err);
-      const retry = () => {
-        document.removeEventListener('pointerdown', retry);
-        document.removeEventListener('touchstart', retry);
-        document.removeEventListener('keydown', retry);
-        if (globalMuted) return;
-        resumeCtx();
-        tryPlay().catch(e => console.warn('bg music retry failed:', e?.name || e));
-      };
-      document.addEventListener('pointerdown', retry, { once: true });
-      document.addEventListener('touchstart', retry, { once: true });
-      document.addEventListener('keydown', retry, { once: true });
-    });
-  }, []);
-
-  const stopBgMusic = useCallback(() => {
-    const bg = getBgMusic();
-    bg.pause();
-    bg.currentTime = 0;
-  }, []);
-
-  const setBgVolume = useCallback((vol: number) => {
-    const bg = getBgMusic();
-    bg.volume = Math.max(0, Math.min(1, vol));
-  }, []);
-
-  const getBgVolume = useCallback(() => {
-    return getBgMusic().volume;
-  }, []);
-
-  return { playCoin, playLevelUp, playLevelDown, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, startBgMusic, stopBgMusic, setBgVolume, getBgVolume, muted, toggleMute };
+  return { playCoin, playLevelUp, playLevelDown, playSuccess, playClick, playSwipe, playNav, playDeposit, playWithdraw, playError, playCelebration, playAppOpen, muted, toggleMute };
 };
