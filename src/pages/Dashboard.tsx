@@ -188,33 +188,6 @@ const Dashboard = () => {
                 <Flame size={14} className="text-accent" />
                 <span className="text-white font-black text-xs">{streak}</span>
               </motion.div>
-              <div className="relative flex items-center gap-1">
-                <button
-                  onClick={() => setShowVolSlider(v => !v)}
-                  className="text-white/60 hover:text-white transition-colors p-1"
-                >
-                  <Music size={16} />
-                </button>
-                <AnimatePresence>
-                  {showVolSlider && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 10 }}
-                      className="absolute right-full mr-1 flex items-center gap-2 bg-white/15 backdrop-blur-md rounded-full px-3 py-1.5"
-                    >
-                      <Slider
-                        value={[bgVol * 100]}
-                        onValueChange={([v]) => { const vol = v / 100; setBgVol(vol); setBgVolume(vol); }}
-                        onValueCommit={() => setTimeout(() => setShowVolSlider(false), 600)}
-                        max={30}
-                        step={1}
-                        className="w-20"
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
               <button onClick={toggleMute} className="text-white/60 hover:text-white transition-colors p-1">
                 {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
               </button>
