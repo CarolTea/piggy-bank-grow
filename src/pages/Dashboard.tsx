@@ -12,9 +12,9 @@ import FlashcardPopup from '@/components/FlashcardPopup';
 import EarningsEntryAnimation from '@/components/EarningsEntryAnimation';
 import LevelUpAnimation from '@/components/LevelUpAnimation';
 import { getPigLevel, PIG_LEVELS } from '@/components/EvolutionaryPig';
-import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap, Volume2, VolumeX, Music } from 'lucide-react';
+import { ArrowDown, ArrowUp, GraduationCap, TrendingUp, LogOut, Flame, Zap, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
+
 
 const HeaderParticles = () => (
   <>
