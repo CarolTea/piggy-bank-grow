@@ -6,28 +6,10 @@ const audioCtx = typeof window !== 'undefined' ? new (window.AudioContext || (wi
 let globalMuted = typeof window !== 'undefined' ? localStorage.getItem('smartpig_muted') === 'true' : false;
 const muteListeners = new Set<(muted: boolean) => void>();
 
-// Background music singleton
-let bgMusic: HTMLAudioElement | null = null;
-function getBgMusic(): HTMLAudioElement {
-  if (!bgMusic) {
-    bgMusic = new Audio('/sounds/musica_ambiente.mp3');
-    bgMusic.loop = true;
-    bgMusic.volume = 0.08; // very low so it doesn't compete
-  }
-  return bgMusic;
-}
-
 function setGlobalMuted(muted: boolean) {
   globalMuted = muted;
   if (typeof window !== 'undefined') localStorage.setItem('smartpig_muted', String(muted));
   muteListeners.forEach(fn => fn(muted));
-  // Sync bg music
-  const bg = getBgMusic();
-  if (muted) {
-    bg.pause();
-  } else if (!bg.paused === false) {
-    // will be resumed by startBgMusic if it was playing
-  }
 }
 
 function resumeCtx() {
