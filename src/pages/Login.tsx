@@ -166,7 +166,7 @@ const Login = () => {
         transition={{ delay: 0.6 }}
         className="text-white/70 text-center mb-6 max-w-xs relative z-10 font-semibold"
       >
-        Sua poupança que viaja pelas estrelas. Simples, segura e divertida.
+        Pequenos investimentos. Um universo de possibilidades.
       </motion.p>
 
       <AnimatePresence mode="wait">
