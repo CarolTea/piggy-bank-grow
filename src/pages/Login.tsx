@@ -73,14 +73,6 @@ const LoginParticles = () => (
   </>
 );
 
-const DEMO_BULLETS = [
-  { icon: Shield, title: 'Auth invisível via Privy', desc: 'Login social cria sua carteira automaticamente. Sem seed phrase, sem extensão, sem complicação' },
-  { icon: QrCode, title: 'PIX → USDC via Banxa', desc: 'Conversão PIX → USDC na Stellar. Deposite R$10, R$50 ou R$500' },
-  { icon: ArrowRightLeft, title: 'Melhor rota via Jupiter Swap API', desc: 'Swap automático USDC → Blend pela melhor rota e menor taxa do mercado' },
-  { icon: TrendingUp, title: 'Blend: ~7.5–8.5% ao ano', desc: 'Lending nativo da Stellar. Rendimento sem Impermanent Loss' },
-  { icon: GraduationCap, title: 'Gamificação que educa', desc: 'Porquinho evolui conforme você poupa, com flashcards de educação financeira' },
-  { icon: Wallet, title: 'Só cobramos quando você ganha', desc: 'Performance fee de 15% sobre o yield. Sem mensalidade, sem barreira de entrada' },
-];
 
 const Login = () => {
   const { login, signup, isLoading } = useAuth();
