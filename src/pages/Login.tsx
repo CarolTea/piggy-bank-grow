@@ -117,24 +117,7 @@ const Login = () => {
       <LoginParticles />
 
       {/* Toggle Demo / Experiência */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="absolute top-6 right-6 z-20 flex items-center gap-2"
-      >
-        <button
-          onClick={() => setMode('demo')}
-          className={`px-3 py-1.5 rounded-l-xl text-xs font-bold transition-all ${mode === 'demo' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/40'}`}
-        >
-          Demo
-        </button>
-        <button
-          onClick={() => setMode('experience')}
-          className={`px-3 py-1.5 rounded-r-xl text-xs font-bold transition-all ${mode === 'experience' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/40'}`}
-        >
-          Experiência
-        </button>
-      </motion.div>
+      {/* REMOVED per user request */}
 
       <motion.div
         initial={{ scale: 0, rotate: -20 }}
