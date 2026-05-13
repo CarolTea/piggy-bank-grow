@@ -120,7 +120,7 @@ const Login = () => {
           animate={{ y: [0, -14, 0] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <PigSVG size={mode === 'demo' ? 100 : 140} />
+          <PigSVG size={140} />
         </motion.div>
       </motion.div>
 
