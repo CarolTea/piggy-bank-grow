@@ -73,19 +73,10 @@ const LoginParticles = () => (
   </>
 );
 
-const DEMO_BULLETS = [
-  { icon: Shield, title: 'Auth invisível via Privy', desc: 'Login social cria sua carteira automaticamente. Sem seed phrase, sem extensão, sem complicação' },
-  { icon: QrCode, title: 'PIX → USDC via Banxa', desc: 'Conversão PIX → USDC na Stellar. Deposite R$10, R$50 ou R$500' },
-  { icon: ArrowRightLeft, title: 'Melhor rota via Jupiter Swap API', desc: 'Swap automático USDC → Blend pela melhor rota e menor taxa do mercado' },
-  { icon: TrendingUp, title: 'Blend: ~7.5–8.5% ao ano', desc: 'Lending nativo da Stellar. Rendimento sem Impermanent Loss' },
-  { icon: GraduationCap, title: 'Gamificação que educa', desc: 'Porquinho evolui conforme você poupa, com flashcards de educação financeira' },
-  { icon: Wallet, title: 'Só cobramos quando você ganha', desc: 'Performance fee de 15% sobre o yield. Sem mensalidade, sem barreira de entrada' },
-];
 
 const Login = () => {
   const { login, signup, isLoading } = useAuth();
   const { playAppOpen } = useSound();
-  const [mode, setMode] = useState<'demo' | 'experience'>('experience');
   const [showEmail, setShowEmail] = useState(true);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -117,24 +108,7 @@ const Login = () => {
       <LoginParticles />
 
       {/* Toggle Demo / Experiência */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="absolute top-6 right-6 z-20 flex items-center gap-2"
-      >
-        <button
-          onClick={() => setMode('demo')}
-          className={`px-3 py-1.5 rounded-l-xl text-xs font-bold transition-all ${mode === 'demo' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/40'}`}
-        >
-          Demo
-        </button>
-        <button
-          onClick={() => setMode('experience')}
-          className={`px-3 py-1.5 rounded-r-xl text-xs font-bold transition-all ${mode === 'experience' ? 'bg-white/20 text-white' : 'bg-white/5 text-white/40'}`}
-        >
-          Experiência
-        </button>
-      </motion.div>
+      {/* REMOVED per user request */}
 
       <motion.div
         initial={{ scale: 0, rotate: -20 }}
@@ -146,7 +120,7 @@ const Login = () => {
           animate={{ y: [0, -14, 0] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <PigSVG size={mode === 'demo' ? 100 : 140} />
+          <PigSVG size={140} />
         </motion.div>
       </motion.div>
 
@@ -170,109 +144,73 @@ const Login = () => {
       </motion.p>
 
       <AnimatePresence mode="wait">
-        {mode === 'demo' ? (
-          <motion.div
-            key="demo"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="w-full max-w-sm space-y-3 relative z-10"
-          >
-            <div className="space-y-2.5 mb-5">
-              {DEMO_BULLETS.map((b, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 * i }}
-                  className="flex items-start gap-3 bg-white/[0.06] backdrop-blur-sm rounded-xl px-4 py-3 border border-white/[0.08]"
-                >
-                  <b.icon size={18} className="text-pink-400 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-white text-sm font-bold leading-tight">{b.title}</p>
-                    <p className="text-white/50 text-xs leading-snug mt-0.5">{b.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
+        <motion.div
+          key="experience"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="w-full max-w-sm space-y-3 relative z-10"
+        >
+          {!showEmail ? (
             <Button
-              className="w-full h-14 text-base font-black rounded-2xl gradient-hot text-white glow-pink border-0 active:scale-95 transition-transform"
-              onClick={() => setMode('experience')}
+              className="w-full h-14 text-base font-black rounded-2xl text-white/70 hover:text-white hover:bg-white/5 gap-3 border-0 bg-transparent active:scale-95 transition-transform"
+              onClick={() => setShowEmail(true)}
             >
-              Entrar na Experiência →
+              <Mail size={20} />
+              Continuar com E-mail
             </Button>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="experience"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="w-full max-w-sm space-y-3 relative z-10"
-          >
-            {!showEmail ? (
-              <Button
-                className="w-full h-14 text-base font-black rounded-2xl text-white/70 hover:text-white hover:bg-white/5 gap-3 border-0 bg-transparent active:scale-95 transition-transform"
-                onClick={() => setShowEmail(true)}
-              >
-                <Mail size={20} />
-                Continuar com E-mail
-              </Button>
-            ) : (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-2">
-                {isSignUp && (
-                  <Input
-                    type="text"
-                    placeholder="Seu nome"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
-                  />
-                )}
+          ) : (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-2">
+              {isSignUp && (
                 <Input
-                  type="email"
-                  placeholder="seu@email.com"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  type="text"
+                  placeholder="Seu nome"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
                   className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
                 />
-                <div className="relative">
-                  <Input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Senha (mín. 6 caracteres)"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm pr-12"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(s => !s)}
-                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-                <Button
-                  className="w-full h-14 rounded-2xl gradient-hot text-white font-black glow-pink border-0 active:scale-95 transition-transform"
-                  onClick={handleEmailSubmit}
-                  disabled={!email || !password || password.length < 6 || isLoading}
-                >
-                  {isLoading ? <Loader2 className="animate-spin" size={20} /> : (isSignUp ? 'Criar Conta' : 'Entrar')}
-                </Button>
+              )}
+              <Input
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm"
+              />
+              <div className="relative">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Senha (mín. 6 caracteres)"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className="h-14 rounded-2xl bg-white/10 border-white/15 text-white placeholder:text-white/30 font-semibold backdrop-blur-sm pr-12"
+                />
                 <button
-                  onClick={() => setIsSignUp(!isSignUp)}
-                  className="w-full text-center text-white/50 text-sm font-semibold hover:text-white/70 transition-colors py-1"
+                  type="button"
+                  onClick={() => setShowPassword(s => !s)}
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
                 >
-                  {isSignUp ? 'Já tenho conta → Entrar' : 'Não tem conta? Criar agora'}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
-              </motion.div>
-            )}
-          </motion.div>
-        )}
+              </div>
+              <Button
+                className="w-full h-14 rounded-2xl gradient-hot text-white font-black glow-pink border-0 active:scale-95 transition-transform"
+                onClick={handleEmailSubmit}
+                disabled={!email || !password || password.length < 6 || isLoading}
+              >
+                {isLoading ? <Loader2 className="animate-spin" size={20} /> : (isSignUp ? 'Criar Conta' : 'Entrar')}
+              </Button>
+              <button
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="w-full text-center text-white/50 text-sm font-semibold hover:text-white/70 transition-colors py-1"
+              >
+                {isSignUp ? 'Já tenho conta → Entrar' : 'Não tem conta? Criar agora'}
+              </button>
+            </motion.div>
+          )}
+        </motion.div>
       </AnimatePresence>
 
       <motion.div
