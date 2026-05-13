@@ -10,14 +10,15 @@ import { toast } from 'sonner';
 
 const LoginParticles = () => (
   <>
-    {Array.from({ length: 18 }).map((_, i) => (
+    {/* Nebula blobs */}
+    {Array.from({ length: 14 }).map((_, i) => (
       <motion.div
-        key={i}
+        key={`neb-${i}`}
         className="absolute rounded-full pointer-events-none"
         style={{
           width: 6 + Math.random() * 20,
           height: 6 + Math.random() * 20,
-          background: `hsla(${300 + Math.random() * 80}, 80%, 60%, ${0.06 + Math.random() * 0.12})`,
+          background: `hsla(${220 + Math.random() * 80}, 80%, 65%, ${0.06 + Math.random() * 0.12})`,
           left: `${Math.random() * 100}%`,
           top: `${Math.random() * 100}%`,
           filter: 'blur(1px)',
@@ -35,6 +36,39 @@ const LoginParticles = () => (
           ease: 'easeInOut',
         }}
       />
+    ))}
+    {/* Twinkling stars */}
+    {Array.from({ length: 40 }).map((_, i) => (
+      <div
+        key={`star-${i}`}
+        className="absolute rounded-full bg-white animate-twinkle pointer-events-none"
+        style={{
+          width: 1 + Math.random() * 2,
+          height: 1 + Math.random() * 2,
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          animationDelay: `${Math.random() * 3}s`,
+          boxShadow: '0 0 4px rgba(255,255,255,0.8)',
+        }}
+      />
+    ))}
+    {/* Shooting stars */}
+    {Array.from({ length: 2 }).map((_, i) => (
+      <div
+        key={`shoot-${i}`}
+        className="absolute pointer-events-none animate-shooting-star"
+        style={{
+          left: `${10 + i * 40}%`,
+          top: `${10 + i * 20}%`,
+          animationDelay: `${i * 2.5}s`,
+        }}
+      >
+        <div style={{
+          width: 80, height: 1.5,
+          background: 'linear-gradient(90deg, transparent, white, transparent)',
+          boxShadow: '0 0 6px white',
+        }} />
+      </div>
     ))}
   </>
 );
