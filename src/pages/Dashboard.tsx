@@ -238,7 +238,7 @@ const Dashboard = () => {
                 key={Math.floor(displayBalance)}
                 initial={{ scale: 1.08, opacity: 0.7 }}
                 animate={{ scale: 1, opacity: 1 }}
-                style={{ textShadow: '0 0 30px hsla(320, 90%, 58%, 0.3)' }}
+                style={{ textShadow: '0 0 30px hsla(210, 100%, 70%, 0.5), 0 0 60px hsla(260, 90%, 65%, 0.3)' }}
               >
                 R$ {displayBalance.toFixed(2)}
               </motion.p>
