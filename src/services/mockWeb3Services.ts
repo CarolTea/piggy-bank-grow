@@ -93,7 +93,7 @@ export const mockFlashcards: Flashcard[] = [
   {
     id: 3,
     title: 'Staking — Rendimento Passivo',
-    content: 'Staking é como deixar seu dinheiro "trabalhando" para validar transações na blockchain. Em troca, você recebe recompensas diárias. No Smart Pig, seu saldo rende automaticamente via Blend na Stellar.',
+    content: 'Staking é como deixar seu dinheiro "trabalhando" para validar transações na blockchain. Em troca, você recebe recompensas diárias. No Stellar Pig, seu saldo rende automaticamente via Blend na Stellar.',
     emoji: '⛏️',
     color: 'from-amber-600 to-orange-500',
   },
@@ -114,7 +114,7 @@ export const mockFlashcards: Flashcard[] = [
   {
     id: 6,
     title: 'Liquidez — Por que Seus Reais Rendem',
-    content: 'Quando você deposita no Smart Pig, seu dinheiro entra em pools de liquidez. Outros usuários usam essa liquidez para trocar tokens, e você recebe uma parte das taxas. Quanto mais gente usa, mais você ganha!',
+    content: 'Quando você deposita no Stellar Pig, seu dinheiro entra em pools de liquidez. Outros usuários usam essa liquidez para trocar tokens, e você recebe uma parte das taxas. Quanto mais gente usa, mais você ganha!',
     emoji: '💧',
     color: 'from-blue-600 to-cyan-500',
   },
@@ -142,7 +142,7 @@ export const mockFlashcards: Flashcard[] = [
   {
     id: 10,
     title: 'Taxas Zero — Como é Possível?',
-    content: 'O Smart Pig não cobra taxas de depósito ou saque. O rendimento que mostramos já é líquido. Ganhamos uma pequena parte do yield gerado, alinhando nosso sucesso com o seu. Quando você ganha, nós ganhamos.',
+    content: 'O Stellar Pig não cobra taxas de depósito ou saque. O rendimento que mostramos já é líquido. Ganhamos uma pequena parte do yield gerado, alinhando nosso sucesso com o seu. Quando você ganha, nós ganhamos.',
     emoji: '🎉',
     color: 'from-fuchsia-600 to-pink-500',
   },
@@ -156,7 +156,7 @@ export const mockFlashcards: Flashcard[] = [
   {
     id: 12,
     title: 'O Futuro das Finanças',
-    content: 'DeFi está revolucionando como o dinheiro funciona. Sem intermediários, sem burocracia, sem fronteiras. O Smart Pig é a porta de entrada mais simples para esse mundo — seu porquinho cuida de tudo para você! 🐷',
+    content: 'DeFi está revolucionando como o dinheiro funciona. Sem intermediários, sem burocracia, sem fronteiras. O Stellar Pig é a porta de entrada mais simples para esse mundo — seu porquinho cuida de tudo para você! 🐷',
     emoji: '🚀',
     color: 'from-indigo-600 to-violet-500',
   },

@@ -20,7 +20,7 @@ const HeaderParticles = () => (
   <>
     {Array.from({ length: 10 }).map((_, i) => (
       <motion.div
-        key={i}
+        key={`p-${i}`}
         className="absolute rounded-full pointer-events-none"
         style={{
           width: 3 + Math.random() * 5,
@@ -41,6 +41,32 @@ const HeaderParticles = () => (
         }}
       />
     ))}
+    {/* Twinkling stars */}
+    {Array.from({ length: 18 }).map((_, i) => (
+      <div
+        key={`s-${i}`}
+        className="absolute rounded-full bg-white animate-twinkle pointer-events-none"
+        style={{
+          width: 1 + Math.random() * 2,
+          height: 1 + Math.random() * 2,
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          animationDelay: `${Math.random() * 3}s`,
+          boxShadow: '0 0 4px rgba(255,255,255,0.9)',
+        }}
+      />
+    ))}
+    {/* Shooting star */}
+    <div
+      className="absolute pointer-events-none animate-shooting-star"
+      style={{ left: '5%', top: '15%' }}
+    >
+      <div style={{
+        width: 60, height: 1.5,
+        background: 'linear-gradient(90deg, transparent, white, transparent)',
+        boxShadow: '0 0 6px white',
+      }} />
+    </div>
   </>
 );
 
@@ -212,7 +238,7 @@ const Dashboard = () => {
                 key={Math.floor(displayBalance)}
                 initial={{ scale: 1.08, opacity: 0.7 }}
                 animate={{ scale: 1, opacity: 1 }}
-                style={{ textShadow: '0 0 30px hsla(320, 90%, 58%, 0.3)' }}
+                style={{ textShadow: '0 0 30px hsla(210, 100%, 70%, 0.5), 0 0 60px hsla(260, 90%, 65%, 0.3)' }}
               >
                 R$ {displayBalance.toFixed(2)}
               </motion.p>
