@@ -123,7 +123,7 @@ const Login = () => {
         className="text-5xl font-black text-white mb-1 relative z-10"
         style={{ textShadow: '0 0 40px hsla(320, 90%, 58%, 0.4)' }}
       >
-        Smart Pig
+        Stellar Pig
       </motion.h1>
 
       <motion.p
