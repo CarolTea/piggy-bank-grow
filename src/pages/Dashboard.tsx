@@ -299,8 +299,8 @@ const Dashboard = () => {
             {[
               { label: 'Rendimento hoje', value: `+R$ ${dailyYield.toFixed(4)}`, color: 'text-success' },
               { label: 'Rendimento/mês', value: `+R$ ${(dailyYield * 30).toFixed(2)}`, color: 'text-success' },
-              { label: 'APY atual', value: '5.87%', color: 'text-primary' },
-              { label: 'Protocolo', value: 'Stellar • Blend', color: 'text-primary' },
+              { label: 'rendimento anual', value: '5.87%', color: 'text-primary' },
+              { label: 'Protocolo', value: 'Stellar/DeFindex', color: 'text-primary' },
             ].map(item => (
               <div key={item.label} className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">{item.label}</span>
