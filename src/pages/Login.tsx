@@ -112,7 +112,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center px-6"
-      style={{ background: 'linear-gradient(145deg, hsl(280 60% 12%), hsl(320 70% 15%), hsl(260 50% 10%))' }}
+      style={{ background: 'radial-gradient(ellipse at top, hsl(250 70% 18%) 0%, hsl(240 60% 8%) 50%, hsl(260 50% 5%) 100%)' }}
     >
       <LoginParticles />
 
@@ -155,7 +155,7 @@ const Login = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
         className="text-5xl font-black text-white mb-1 relative z-10"
-        style={{ textShadow: '0 0 40px hsla(320, 90%, 58%, 0.4)' }}
+        style={{ textShadow: '0 0 30px hsla(210, 100%, 70%, 0.6), 0 0 60px hsla(260, 90%, 65%, 0.4)' }}
       >
         Stellar Pig
       </motion.h1>
@@ -166,7 +166,7 @@ const Login = () => {
         transition={{ delay: 0.6 }}
         className="text-white/70 text-center mb-6 max-w-xs relative z-10 font-semibold"
       >
-        Sua poupança inteligente que rende mais. Simples, segura e divertida.
+        Sua poupança que viaja pelas estrelas. Simples, segura e divertida.
       </motion.p>
 
       <AnimatePresence mode="wait">
