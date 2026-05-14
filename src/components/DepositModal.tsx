@@ -18,7 +18,7 @@ interface Props {
 }
 
 const QUICK_VALUES = [10, 50, 100, 500];
-const PIX_KEY = 'stellarpig@stellar.pay';
+const PIX_KEY = 'pigfi@stellar.pay';
 
 // Simple QR-like SVG pattern (visual only)
 const MockQRCode = () => (
