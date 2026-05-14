@@ -3,12 +3,12 @@ import { useCallback, useState, useEffect, createContext, useContext } from 'rea
 const audioCtx = typeof window !== 'undefined' ? new (window.AudioContext || (window as any).webkitAudioContext)() : null;
 
 // Global mute state
-let globalMuted = typeof window !== 'undefined' ? localStorage.getItem('stellarpig_muted') === 'true' : false;
+let globalMuted = typeof window !== 'undefined' ? localStorage.getItem('pigfi_muted') === 'true' : false;
 const muteListeners = new Set<(muted: boolean) => void>();
 
 function setGlobalMuted(muted: boolean) {
   globalMuted = muted;
-  if (typeof window !== 'undefined') localStorage.setItem('stellarpig_muted', String(muted));
+  if (typeof window !== 'undefined') localStorage.setItem('pigfi_muted', String(muted));
   muteListeners.forEach(fn => fn(muted));
 }
 
