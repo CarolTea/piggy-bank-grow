@@ -1,49 +1,80 @@
-# Renomear Smart Pig → Stellar Pig + Pegada Espacial
+# Login com Passkey Stellar (passkey-kit) — Plano
 
-## Resumo
-Substituir todas as ocorrências de "Smart Pig" / "SmartPig" por "Stellar Pig" / "StellarPig" no app. Adicionar elementos visuais espaciais/estelares ao design (estrelas, nebulosas, brilho cósmico) sem perder a identidade gamificada do porquinho.
+Substituir o login de email/senha por **Passkey Stellar real** usando `passkey-kit`. Cada passkey criada vira uma **smart wallet** na Stellar e fica ligada a um usuário real do backend.
 
-## Escopo
+## Visão geral do fluxo
 
-### 1. Renomeação textual (todas as ocorrências)
-- **`index.html`**: `<title>`, `og:title`, `twitter:title` — SmartPig → StellarPig
-- **`src/pages/Login.tsx`**: h1 "Smart Pig" → "Stellar Pig"
-- **`src/hooks/useSound.ts`**: localStorage key `smartpig_muted` → `stellarpig_muted`
-- **`src/components/DepositModal.tsx`**: PIX key `smartpig@stellar.pay` → `stellarpig@stellar.pay`
-- **`src/services/mockWeb3Services.ts`**: 4 flashcards com "Smart Pig" → "Stellar Pig"
-- **`.lovable/plan.md`**: referências no handoff document
+```text
+[Tela de Login]
+   │
+   ├─ "Criar conta com Passkey"  ──► WebAuthn create  ──► passkey-kit cria smart wallet
+   │                                                   ──► edge function registra credencial + cria usuário
+   │                                                   ──► retorna sessão Supabase
+   │
+   └─ "Entrar com Passkey"       ──► WebAuthn get     ──► edge function valida assertion
+                                                       ──► retorna sessão Supabase do usuário existente
+```
 
-### 2. Pegada espacial/estelar no visual
+A wallet criada pela passkey passa a ser a `walletAddress` real exibida no Dashboard (substitui o mock atual do `AuthContext`).
 
-#### Login (`src/pages/Login.tsx`)
-- Background: trocar gradiente atual por um **gradiente espacial** mais profundo (tons de azul-marinho, roxo-escuro, preto-cosmos)
-- Partículas (`LoginParticles`): adicionar **estrelas piscantes** (pequenos pontos brancos com opacity pulsante) misturadas às partículas roxas/rosas atuais
-- H1 "Stellar Pig": reforçar text-shadow com um brilho **azul-estelar** em vez de pink puro
+## Mudanças no backend
 
-#### Dashboard Header (`src/pages/Dashboard.tsx`)
-- `HeaderParticles`: adicionar **estrelas cadentes** (traços finos brancos que aparecem e desaparecem) e pontos de luz estelar no gradiente do header
-- Saldo: text-shadow com brilho azul-ciano (mais "estelar") em vez de pink
+### Novas tabelas (migration)
 
-#### EvolutionaryPig (`src/components/EvolutionaryPig.tsx`)
-- Nos níveis Dourado e Rei: reforçar o glow para um efeito de **"aurora estelar"** com partículas que parecem constelações ao redor do porquinho
-- Adicionar pequenas **estrelas piscantes** no `FloatingParticles` (pontinhos brancos que piscam, além das partículas coloridas)
+- `passkey_wallets`
+  - `user_id` (FK `auth.users`, PK)
+  - `contract_id` (string, endereço da smart wallet Stellar)
+  - `credential_id` (text, único — id da passkey WebAuthn em base64url)
+  - `public_key` (bytea)
+  - `created_at`
+- RLS: usuário só lê o próprio registro; inserts só via service role (edge function).
 
-#### CSS Globals (`src/index.css`)
-- Adicionar uma nova classe utilitária `.glow-stellar` com box-shadow azul-ciano/roxo para elementos que precisarem de brilho espacial
-- Opcional: keyframe de **twinkle** (piscar) para estrelas
+### Edge functions (3)
 
-## Arquivos a editar
-1. `index.html`
-2. `src/pages/Login.tsx`
-3. `src/pages/Dashboard.tsx`
-4. `src/components/EvolutionaryPig.tsx`
-5. `src/hooks/useSound.ts`
-6. `src/components/DepositModal.tsx`
-7. `src/services/mockWeb3Services.ts`
-8. `src/index.css`
-9. `.lovable/plan.md`
+1. `passkey-register-begin` — gera challenge WebAuthn (`PublicKeyCredentialCreationOptions`).
+2. `passkey-register-complete` — recebe attestation + contract_id da wallet criada pelo passkey-kit no client, valida, cria usuário via `auth.admin.createUser`, grava `passkey_wallets`, gera sessão e devolve `{ access_token, refresh_token }`.
+3. `passkey-login` — gera challenge, recebe assertion, valida com a public_key salva, localiza `user_id`, gera sessão e devolve tokens.
 
-## Notas técnicas
-- Todas as cores continuam no sistema HSL/variáveis do design system
-- Nenhuma lógica de negócio muda — apenas strings e efeitos visuais
-- O porquinho continua o mesmo mascote, apenas com "atmosfera espacial" ao redor
+Sessão entregue ao client via `supabase.auth.setSession(...)`.
+
+### Secrets necessários
+
+- `LAUNCHTUBE_JWT` — relay de gas para submeter txs Stellar sem o usuário pagar.
+- `MERCURY_JWT` — indexador usado pelo passkey-kit server.
+- `STELLAR_RPC_URL` — RPC pública (Testnet por padrão; configurável).
+- `STELLAR_NETWORK_PASSPHRASE` — ex.: `Test SDF Network ; September 2015`.
+- `WALLET_WASM_HASH` — hash do contrato smart-wallet do passkey-kit.
+
+(Já temos `SUPABASE_SERVICE_ROLE_KEY`.)
+
+Vou parar e pedir esses secrets antes de codificar — sem eles a integração real não funciona.
+
+## Mudanças no frontend
+
+- `bun add passkey-kit` (e `@stellar/stellar-sdk` se necessário).
+- Novo módulo `src/lib/passkey.ts` encapsulando `PasskeyKit` (rpcUrl, networkPassphrase, walletWasmHash) e helpers `createWallet()` / `connectWallet()`.
+- Reescrever `src/pages/Login.tsx`: remover bloco email/senha, deixar dois botões grandes:
+  - **Criar conta com Passkey** (chama register-begin → `kit.createWallet()` → register-complete).
+  - **Entrar com Passkey** (chama passkey-login).
+  - Mantém visual neon, porquinho animado e copy atual.
+- `src/contexts/AuthContext.tsx`:
+  - Remove `login`/`signup` por email/senha; expõe `loginWithPasskey()` e `registerWithPasskey()`.
+  - `walletAddress` passa a vir do `contract_id` salvo (busca em `passkey_wallets` após sessão).
+- `supabase/config.toml`: desabilitar provider de email (`[auth.email] enable_signup = false`) já que email/senha sai do fluxo.
+
+## Pontos de atenção
+
+- **HTTPS obrigatório** para WebAuthn — preview/published do Lovable já atendem.
+- **Domínio (rpId)** deve bater com a origem; usar `window.location.hostname` no client e validar no servidor.
+- Sem `LAUNCHTUBE_JWT` válido a criação de wallet falha — função retornará erro claro.
+- O resto do app (PIX mock, Blend mock, flashcards) **não muda**; só a auth e o `walletAddress` real entram em cena.
+
+## Ordem de execução
+
+1. Pedir os 5 secrets via `add_secret`.
+2. Migration: tabela `passkey_wallets` + RLS.
+3. Edge functions (3) + deploy.
+4. `bun add passkey-kit`, criar `lib/passkey.ts`.
+5. Reescrever `Login.tsx` e `AuthContext.tsx`.
+6. Ajustar `config.toml` (desabilitar signup por email).
+7. Testar criar conta + login no preview.
